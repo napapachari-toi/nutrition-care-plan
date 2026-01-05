@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition Care Plan</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>🏥 Nutrition Care Plan</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -22,208 +26,425 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-        .header {
+
+        header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.9; }
-        .nav-tabs { display: flex; background: #f8f9fa; border-bottom: 2px solid #dee2e6; }
-        .nav-tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            background: #f8f9fa;
-            border: none;
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
             font-size: 1.1em;
-            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
             color: #495057;
             transition: all 0.3s;
-            position: relative;
+            white-space: nowrap;
         }
-        .nav-tab:hover { background: #e9ecef; }
-        .nav-tab.active { background: white; color: #667eea; }
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #667eea;
+
+        .nav-tab:hover {
+            background: #e9ecef;
         }
-        .tab-content { display: none; padding: 30px; animation: fadeIn 0.5s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            border-bottom: 3px solid #667eea;
         }
-        .home-container { text-align: center; padding: 60px 20px; }
-        .home-container h2 { font-size: 2.5em; color: #333; margin-bottom: 20px; }
-        .home-container p { font-size: 1.2em; color: #666; margin-bottom: 40px; }
+
+        .content {
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-section h2 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 18px 50px;
-            font-size: 1.3em;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s;
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        .form-container { max-width: 1000px; margin: 0 auto; }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .form-section {
             background: #f8f9fa;
             padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 15px;
-            border-left: 5px solid #667eea;
-        }
-        .form-section h3 { color: #667eea; margin-bottom: 20px; font-size: 1.5em; }
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-weight: 600; color: #333; margin-bottom: 8px; font-size: 0.95em; }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s;
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
         }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+
+        .form-group {
+            margin-bottom: 15px;
         }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
         .checkbox-group {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 10px;
             margin-top: 10px;
         }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; }
-        .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
-        .result-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #dee2e6;
-            margin-top: 15px;
-        }
-        .result-item {
+
+        .checkbox-item {
             display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            align-items: center;
         }
-        .result-item.normal { background: #d4edda; color: #155724; }
-        .result-item.warning { background: #fff3cd; color: #856404; }
-        .result-item.danger { background: #f8d7da; color: #721c24; }
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            transition: all 0.3s;
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
         }
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
+
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s;
+            border-radius: 10px;
+            text-align: center;
         }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-card h3 { font-size: 2.5em; margin-bottom: 10px; }
-        .stat-card p { font-size: 1.1em; opacity: 0.9; }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
         .chart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
+
         .chart-container h3 {
             color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            margin-bottom: 15px;
         }
-        .chart-controls { text-align: right; margin-bottom: 15px; }
-        .btn-download {
-            background: #667eea;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        .table-container {
-            overflow-x: auto;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        table { width: 100%; border-collapse: collapse; }
-        thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        th {
-            padding: 15px;
+
+        th, td {
+            padding: 12px;
             text-align: left;
-            font-weight: 600;
-            position: sticky;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .result-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
             top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
-        td { padding: 12px 15px; border-bottom: 1px solid #dee2e6; }
-        tbody tr:hover { background: #f8f9fa; }
-        .badge {
-            padding: 5px 10px;
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .top5-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .top5-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .top5-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .top5-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .top5-rank {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .top5-name {
+            flex: 1;
+        }
+
+        .top5-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
             border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
+            font-weight: bold;
         }
-        .badge-success { background: #d4edda; color: #155724; }
-        .badge-warning { background: #fff3cd; color: #856404; }
-        .badge-danger { background: #f8d7da; color: #721c24; }
-        .loading { text-align: center; padding: 40px; color: #666; }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -231,208 +452,240 @@
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 0 auto 20px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top5-container {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 Nutrition Care Plan</h1>
-            <p>ระบบบันทึกและติดตามภาวะโภชนาการผู้ป่วย</p>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>กำลังโหลดข้อมูล...</p>
         </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🏥 Nutrition Care Plan</h1>
+            <p class="subtitle">ระบบบันทึกและติดตามภาวะโภชนาการผู้ป่วย</p>
+        </header>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('home')">🏠 หน้าแรก</button>
-            <button class="nav-tab" onclick="switchTab('form')">📝 บันทึกข้อมูล</button>
-            <button class="nav-tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
-            <button class="nav-tab" onclick="switchTab('data')">📋 ตารางข้อมูล</button>
+            <button class="nav-tab active" onclick="showPage('home')">🏠 หน้าแรก</button>
+            <button class="nav-tab" onclick="showPage('form')">📝 บันทึกข้อมูล</button>
+            <button class="nav-tab" onclick="showPage('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="showPage('table')">📋 ตารางข้อมูล</button>
         </div>
 
-        <!-- Home Tab -->
-        <div id="home" class="tab-content active">
-            <div class="home-container">
-                <h2>ยินดีต้อนรับสู่ระบบ Nutrition Care Plan</h2>
-                <p>ระบบบันทึกและติดตามภาวะโภชนาการผู้ป่วยอย่างมีประสิทธิภาพ</p>
-                <button class="btn-primary" onclick="switchTab('form')">
-                    ➕ เพิ่มผู้ป่วยใหม่
-                </button>
+        <div class="content">
+            <!-- หน้าแรก -->
+            <div id="home" class="page active">
+                <div class="welcome-section">
+                    <h2>ยินดีต้อนรับสู่ระบบ Nutrition Care Plan</h2>
+                    <p style="color: #666; margin-bottom: 30px;">ระบบบันทึกและติดตามภาวะโภชนาการผู้ป่วยอย่างมีประสิทธิภาพ</p>
+                    <button class="btn btn-primary" onclick="showPage('form')">➕ เพิ่มผู้ป่วยใหม่</button>
+                    <button class="btn btn-success" onclick="loadAllData()">🔄 รีเฟรชข้อมูล</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Form Tab -->
-        <div id="form" class="tab-content">
-            <div class="form-container">
-                <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">📝 บันทึกข้อมูลผู้ป่วยใหม่</h2>
+            <!-- ฟอร์มบันทึกข้อมูล -->
+            <div id="form" class="page">
+                <h2 style="margin-bottom: 20px;">📝 บันทึกข้อมูลผู้ป่วยใหม่</h2>
+                <div id="alertContainer"></div>
                 
                 <form id="patientForm">
-                    <!-- ข้อมูลพื้นฐาน -->
+                    <input type="hidden" id="editRowNumber" value="">
+                    
                     <div class="form-section">
                         <h3>📋 ข้อมูลพื้นฐาน</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>วันที่บันทึกข้อมูล *</label>
-                                <input type="date" name="recordDate" required>
+                                <input type="date" id="recordDate" required>
                             </div>
                             <div class="form-group">
                                 <label>HN *</label>
-                                <input type="text" name="hn" placeholder="เลข HN ผู้ป่วย" required>
+                                <input type="text" id="hn" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>ชื่อ *</label>
-                                <input type="text" name="firstName" placeholder="ชื่อผู้ป่วย" required>
+                                <input type="text" id="firstName" required>
                             </div>
                             <div class="form-group">
                                 <label>นามสกุล *</label>
-                                <input type="text" name="lastName" placeholder="นามสกุลผู้ป่วย" required>
+                                <input type="text" id="lastName" required>
                             </div>
-                            <div class="form-group">
-                                <label>หอผู้ป่วย *</label>
-                                <select name="ward" required>
-                                    <option value="">-- เลือกหอผู้ป่วย --</option>
-                                    <option value="MED">MED</option>
-                                    <option value="SURG">SURG</option>
-                                    <option value="5">5</option>
-                                    <option value="6">6</option>
-                                    <option value="8">8</option>
-                                </select>
-                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>หอผู้ป่วย *</label>
+                            <select id="ward" required>
+                                <option value="">-- เลือกหอผู้ป่วย --</option>
+                                <option value="MED">MED</option>
+                                <option value="SURG">SURG</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- การวินิจฉัยโรค -->
                     <div class="form-section">
                         <h3>🩺 การวินิจฉัยโรค</h3>
                         <div class="form-group">
                             <label>Diagnosis (โรคหลัก) *</label>
-                            <select name="mainDiagnosis" required>
+                            <select id="diagnosis" required onchange="toggleOtherDiagnosis()">
                                 <option value="">-- เลือกโรคหลัก --</option>
                                 <option value="Stroke">Stroke (โรคหลอดเลือดสมอง)</option>
-                                <option value="Parkinson">Parkinson's Disease</option>
-                                <option value="Alzheimer">Alzheimer's Disease</option>
+                                <option value="Parkinson's Disease">Parkinson's Disease</option>
+                                <option value="Alzheimer's Disease">Alzheimer's Disease</option>
                                 <option value="Epilepsy">Epilepsy (โรคลมชัก)</option>
                                 <option value="Multiple Sclerosis">Multiple Sclerosis</option>
                                 <option value="Brain Tumor">Brain Tumor (เนื้องอกสมอง)</option>
                                 <option value="Meningitis">Meningitis (เยื่อหุ้มสมองอักเสบ)</option>
                                 <option value="Encephalitis">Encephalitis (สมองอักเสบ)</option>
                                 <option value="Migraine">Migraine (ไมเกรน)</option>
-                                <option value="Other">อื่นๆ</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" id="otherDiagnosisGroup" style="display: none;">
                             <label>โรคหลักอื่นๆ (ถ้ามี)</label>
-                            <input type="text" name="otherDiagnosis" placeholder="ระบุโรคหลักอื่นๆ">
+                            <input type="text" id="otherDiagnosis">
                         </div>
-                        
                         <div class="form-group">
                             <label>โรคประจำตัว</label>
                             <div class="checkbox-group">
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="dm" name="chronic" value="DM">
+                                    <input type="checkbox" id="dm" value="DM">
                                     <label for="dm">DM (เบาหวาน)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="dlp" name="chronic" value="DLP">
+                                    <input type="checkbox" id="dlp" value="DLP">
                                     <label for="dlp">DLP (ไขมันในเลือดสูง)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="ht" name="chronic" value="HT">
+                                    <input type="checkbox" id="ht" value="HT">
                                     <label for="ht">HT (ความดันโลหิตสูง)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="gout" name="chronic" value="GOUT">
+                                    <input type="checkbox" id="gout" value="GOUT">
                                     <label for="gout">GOUT (เก๊าท์)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="ckd" name="chronic" value="CKD">
+                                    <input type="checkbox" id="ckd" value="CKD">
                                     <label for="ckd">CKD (ไตเรื้อรัง)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="cad" name="chronic" value="CAD">
+                                    <input type="checkbox" id="cad" value="CAD">
                                     <label for="cad">CAD (หลอดเลือดหัวใจ)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="copd" name="chronic" value="COPD">
+                                    <input type="checkbox" id="copd" value="COPD">
                                     <label for="copd">COPD (ปอดอุดกั้นเรื้อรัง)</label>
                                 </div>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="cirrhosis" name="chronic" value="Cirrhosis">
+                                    <input type="checkbox" id="cirrhosis" value="Cirrhosis">
                                     <label for="cirrhosis">Cirrhosis (ตับแข็ง)</label>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>โรคประจำตัวอื่นๆ</label>
-                            <input type="text" name="otherChronic" placeholder="ระบุโรคประจำตัวอื่นๆ">
+                            <input type="text" id="otherChronicDiseases">
                         </div>
                     </div>
 
-                    <!-- ข้อมูลทางโภชนาการ -->
                     <div class="form-section">
                         <h3>📊 ข้อมูลทางโภชนาการ</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>คะแนน NAF (0-15) *</label>
-                                <input type="number" name="nafScore" min="0" max="15" step="1" required onchange="calculateNAF()">
+                                <input type="number" id="nafScore" min="0" max="15" required oninput="calculateResults()">
                             </div>
                             <div class="form-group">
                                 <label>น้ำหนัก (kg) *</label>
-                                <input type="number" name="weight" step="0.1" required onchange="calculateBMI()">
+                                <input type="number" id="weight" step="0.1" required oninput="calculateResults()">
                             </div>
                             <div class="form-group">
                                 <label>ส่วนสูง (cm) *</label>
-                                <input type="number" name="height" step="0.1" required onchange="calculateBMI()">
+                                <input type="number" id="height" step="0.1" required oninput="calculateResults()">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Albumin (g/dL)</label>
-                                <input type="number" name="albumin" step="0.1" onchange="checkAlbumin()">
+                                <input type="number" id="albumin" step="0.1" oninput="calculateResults()">
                             </div>
                             <div class="form-group">
                                 <label>Total Protein (g/dL)</label>
-                                <input type="number" name="totalProtein" step="0.1" onchange="checkTotalProtein()">
+                                <input type="number" id="totalProtein" step="0.1" oninput="calculateResults()">
                             </div>
                         </div>
-
-                        <div class="result-box" id="assessmentResults">
-                            <h4 style="margin-bottom: 15px; color: #667eea;">📋 ผลการประเมิน</h4>
-                            <div class="result-item" id="nafResult">
-                                <span>ผลการคัดกรอง NAF:</span>
-                                <strong>-</strong>
+                        
+                        <h4 style="margin-top: 20px; margin-bottom: 10px;">📋 ผลการประเมิน</h4>
+                        <div class="result-box">
+                            <div class="result-item">
+                                <span class="result-label">ผลการคัดกรอง NAF:</span>
+                                <span class="result-value" id="nafResult">-</span>
                             </div>
-                            <div class="result-item" id="bmiResult">
-                                <span>BMI:</span>
-                                <strong>-</strong>
+                            <div class="result-item">
+                                <span class="result-label">BMI:</span>
+                                <span class="result-value" id="bmiResult">-</span>
                             </div>
-                            <div class="result-item" id="albuminResult">
-                                <span>Albumin:</span>
-                                <strong>-</strong>
+                            <div class="result-item">
+                                <span class="result-label">Albumin:</span>
+                                <span class="result-value" id="albuminResult">-</span>
                             </div>
-                            <div class="result-item" id="proteinResult">
-                                <span>Total Protein:</span>
-                                <strong>-</strong>
+                            <div class="result-item">
+                                <span class="result-label">Total Protein:</span>
+                                <span class="result-value" id="totalProteinResult">-</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- การติดตาม -->
                     <div class="form-section">
                         <h3>📅 การติดตาม</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>วันที่ติดตาม / Follow up</label>
-                                <input type="date" name="followUpDate">
+                                <input type="date" id="followUpDate">
                             </div>
                             <div class="form-group">
                                 <label>ผลการติดตาม</label>
-                                <select name="followUpResult">
+                                <select id="followUpResult">
                                     <option value="">-- ยังไม่ติดตาม --</option>
                                     <option value="ดีขึ้น">ดีขึ้น</option>
                                     <option value="คงที่">คงที่</option>
@@ -441,84 +694,390 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label>รายละเอียดเพิ่มเติม (ถ้ามี)</label>
+                            <textarea id="followUpDetails" placeholder="บันทึกรายละเอียดการติดตาม เช่น อาการ การรับประทานอาหาร ผลตรวจทางห้องปฏิบัติการ หมายเหตุ"></textarea>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn-submit">💾 บันทึกข้อมูล</button>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">💾 บันทึกข้อมูล</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()" id="cancelBtn" style="display: none;">❌ ยกเลิก</button>
+                    </div>
                 </form>
             </div>
-        </div>
 
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-content">
-            <h2 style="color: #667eea; margin-bottom: 30px;">📊 Dashboard - ภาพรวมข้อมูลผู้ป่วย</h2>
+            <!-- Dashboard -->
+            <div id="dashboard" class="page">
+                <h2 style="margin-bottom: 20px;">📊 Dashboard - ภาพรวมข้อมูลผู้ป่วย</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPatients">-</div>
+                        <div class="stat-label">ผู้ป่วยทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="needFollowUp">-</div>
+                        <div class="stat-label">ต้องติดตาม</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="followedUp">-</div>
+                        <div class="stat-label">ติดตามแล้ว</div>
+                    </div>
+                </div>
+
+                <!-- Top 5 Diagnosis และ โรคประจำตัว -->
+                <div class="top5-container">
+                    <div class="top5-card">
+                        <h3>🏆 Top 5 Diagnosis (โรคหลัก)</h3>
+                        <div id="top5Diagnosis"></div>
+                    </div>
+                    <div class="top5-card">
+                        <h3>🏆 Top 5 โรคประจำตัว</h3>
+                        <div id="top5Chronic"></div>
+                    </div>
+                </div>
+
+                <div id="chartsContainer"></div>
+            </div>
+
+            <!-- ตารางข้อมูล -->
+            <div id="table" class="page">
+                <h2 style="margin-bottom: 20px;">📋 ตารางข้อมูลผู้ป่วยทั้งหมด</h2>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-success" onclick="loadAllData()">🔄 รีเฟรชข้อมูล</button>
+                </div>
+                <div id="tableContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับแก้ไข/ลบ -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">⚠️ ยืนยันการลบข้อมูล</div>
+            <p>คุณต้องการลบข้อมูลผู้ป่วย <strong id="deletePatientName"></strong> ใช่หรือไม่?</p>
+            <p style="color: #dc3545; margin-top: 10px;">⚠️ การลบข้อมูลไม่สามารถกู้คืนได้</p>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">ยกเลิก</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">ลบข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ สำคัญ: แทนที่ URL ด้านล่างนี้ด้วย Web App URL ของคุณจาก Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
+        
+        let patients = [];
+        let deleteRowNumber = null;
+
+        window.onload = function() {
+            setDefaultDate();
+            loadAllData();
+        };
+
+        function showLoading(show = true) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('recordDate').value = today;
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
             
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3 id="totalPatients">-</h3>
-                    <p>ผู้ป่วยทั้งหมด</p>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <h3 id="needFollowUp">-</h3>
-                    <p>ต้องติดตาม</p>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                    <h3 id="followed">-</h3>
-                    <p>ติดตามแล้ว</p>
-                </div>
-            </div>
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
 
-            <div class="chart-container">
-                <div class="chart-controls">
-                    <button class="btn-download" onclick="downloadChart('nafChart')">💾 บันทึกรูปภาพ</button>
-                </div>
-                <h3>ภาวะโภชนาการ (NAF Score)</h3>
-                <canvas id="nafChart"></canvas>
-            </div>
+            if (pageId === 'dashboard') {
+                updateDashboard();
+            } else if (pageId === 'table') {
+                renderTable();
+            }
+        }
 
-            <div class="chart-container">
-                <div class="chart-controls">
-                    <button class="btn-download" onclick="downloadChart('wardChart')">💾 บันทึกรูปภาพ</button>
-                </div>
-                <h3>จำนวนผู้ป่วยแยกตามหอ</h3>
-                <canvas id="wardChart"></canvas>
-            </div>
+        function toggleOtherDiagnosis() {
+            const diagnosis = document.getElementById('diagnosis').value;
+            const otherGroup = document.getElementById('otherDiagnosisGroup');
+            otherGroup.style.display = diagnosis === 'อื่นๆ' ? 'block' : 'none';
+        }
 
-            <div class="chart-container">
-                <div class="chart-controls">
-                    <button class="btn-download" onclick="downloadChart('bmiChart')">💾 บันทึกรูปภาพ</button>
-                </div>
-                <h3>สัดส่วนค่า BMI</h3>
-                <canvas id="bmiChart"></canvas>
-            </div>
+        function calculateResults() {
+            const nafScore = parseFloat(document.getElementById('nafScore').value) || 0;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const height = parseFloat(document.getElementById('height').value) || 0;
+            const albumin = parseFloat(document.getElementById('albumin').value) || 0;
+            const totalProtein = parseFloat(document.getElementById('totalProtein').value) || 0;
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                <div class="chart-container">
-                    <div class="chart-controls">
-                        <button class="btn-download" onclick="downloadChart('albuminChart')">💾 บันทึกรูปภาพ</button>
-                    </div>
-                    <h3>ค่า Albumin</h3>
-                    <canvas id="albuminChart"></canvas>
-                </div>
+            let nafResult = '-';
+            if (nafScore >= 0 && nafScore <= 15) {
+                if (nafScore >= 10) nafResult = 'มีความเสี่ยงสูง (≥10)';
+                else if (nafScore >= 6) nafResult = 'มีความเสี่ยงปานกลาง (6-9)';
+                else nafResult = 'มีความเสี่ยงต่ำ (<6)';
+            }
 
-                <div class="chart-container">
-                    <div class="chart-controls">
-                        <button class="btn-download" onclick="downloadChart('proteinChart')">💾 บันทึกรูปภาพ</button>
-                    </div>
-                    <h3>ค่า Total Protein</h3>
-                    <canvas id="proteinChart"></canvas>
-                </div>
-            </div>
-        </div>
+            let bmiResult = '-';
+            if (weight > 0 && height > 0) {
+                const bmi = weight / Math.pow(height / 100, 2);
+                let status = '';
+                if (bmi < 18.5) status = 'ผอม';
+                else if (bmi < 23) status = 'ปกติ';
+                else if (bmi < 25) status = 'น้ำหนักเกิน';
+                else if (bmi < 30) status = 'โรคอ้วนระดับ 1';
+                else status = 'โรคอ้วนระดับ 2';
+                bmiResult = `${bmi.toFixed(2)} (${status})`;
+            }
 
-        <!-- Data Table Tab -->
-        <div id="data" class="tab-content">
-            <h2 style="color: #667eea; margin-bottom: 20px;">📋 ตารางข้อมูลผู้ป่วยทั้งหมด</h2>
-            <div class="table-container">
-                <div class="loading" id="tableLoading">
-                    <div class="spinner"></div>
-                    <p>กำลังโหลดข้อมูล...</p>
-                </div>
-                <table id="dataTable" style="display: none;">
+            let albuminResult = '-';
+            if (albumin > 0) {
+                if (albumin >= 3.5) albuminResult = `${albumin} (ปกติ)`;
+                else if (albumin >= 3.0) albuminResult = `${albumin} (ต่ำกว่าปกติเล็กน้อย)`;
+                else albuminResult = `${albumin} (ต่ำ)`;
+            }
+
+            let totalProteinResult = '-';
+            if (totalProtein > 0) {
+                if (totalProtein >= 6.0 && totalProtein <= 8.3) totalProteinResult = `${totalProtein} (ปกติ)`;
+                else if (totalProtein < 6.0) totalProteinResult = `${totalProtein} (ต่ำ)`;
+                else totalProteinResult = `${totalProtein} (สูง)`;
+            }
+
+            document.getElementById('nafResult').textContent = nafResult;
+            document.getElementById('bmiResult').textContent = bmiResult;
+            document.getElementById('albuminResult').textContent = albuminResult;
+            document.getElementById('totalProteinResult').textContent = totalProteinResult;
+        }
+
+        function getChronicDiseases() {
+            const diseases = [];
+            const checkboxes = ['dm', 'dlp', 'ht', 'gout', 'ckd', 'cad', 'copd', 'cirrhosis'];
+            checkboxes.forEach(id => {
+                if (document.getElementById(id).checked) {
+                    diseases.push(document.getElementById(id).value);
+                }
+            });
+            const other = document.getElementById('otherChronicDiseases').value.trim();
+            if (other) diseases.push(other);
+            return diseases;
+        }
+
+        function setChronicDiseases(diseases) {
+            const checkboxes = ['dm', 'dlp', 'ht', 'gout', 'ckd', 'cad', 'copd', 'cirrhosis'];
+            checkboxes.forEach(id => {
+                document.getElementById(id).checked = false;
+            });
+            document.getElementById('otherChronicDiseases').value = '';
+            
+            if (!diseases) return;
+            
+            const diseaseArray = Array.isArray(diseases) ? diseases : diseases.split(',').map(d => d.trim());
+            const standardDiseases = ['DM', 'DLP', 'HT', 'GOUT', 'CKD', 'CAD', 'COPD', 'Cirrhosis'];
+            const otherDiseases = [];
+            
+            diseaseArray.forEach(disease => {
+                const checkbox = checkboxes.find(id => document.getElementById(id).value === disease);
+                if (checkbox) {
+                    document.getElementById(checkbox).checked = true;
+                } else if (disease && !standardDiseases.includes(disease)) {
+                    otherDiseases.push(disease);
+                }
+            });
+            
+            if (otherDiseases.length > 0) {
+                document.getElementById('otherChronicDiseases').value = otherDiseases.join(', ');
+            }
+        }
+
+        async function loadAllData() {
+            showLoading(true);
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    patients = data.data;
+                    renderTable();
+                    updateDashboard();
+                    showAlert('โหลดข้อมูลสำเร็จ! ✅', 'success');
+                } else {
+                    showAlert('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        document.getElementById('patientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const diagnosis = document.getElementById('diagnosis').value;
+            const finalDiagnosis = diagnosis === 'อื่นๆ' ? document.getElementById('otherDiagnosis').value : diagnosis;
+            const chronicDiseases = getChronicDiseases().join(', ');
+
+            const formData = {
+                action: document.getElementById('editRowNumber').value ? 'update' : 'add',
+                rowNumber: document.getElementById('editRowNumber').value || '',
+                recordDate: document.getElementById('recordDate').value,
+                hn: document.getElementById('hn').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                ward: document.getElementById('ward').value,
+                diagnosis: finalDiagnosis,
+                chronicDiseases: chronicDiseases,
+                nafScore: document.getElementById('nafScore').value,
+                weight: document.getElementById('weight').value,
+                height: document.getElementById('height').value,
+                albumin: document.getElementById('albumin').value || '',
+                totalProtein: document.getElementById('totalProtein').value || '',
+                followUpDate: document.getElementById('followUpDate').value || '',
+                followUpResult: document.getElementById('followUpResult').value || '',
+                followUpDetails: document.getElementById('followUpDetails').value || ''
+            };
+
+            showLoading(true);
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const isEdit = formData.action === 'update';
+                    showAlert(isEdit ? 'แก้ไขข้อมูลสำเร็จ! ✅' : 'บันทึกข้อมูลสำเร็จ! ✅', 'success');
+                    resetForm();
+                    await loadAllData();
+                    setTimeout(() => showPage('table'), 1500);
+                } else {
+                    showAlert('เกิดข้อผิดพลาด: ' + (result.message || 'ไม่สามารถบันทึกข้อมูลได้'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function resetForm() {
+            document.getElementById('patientForm').reset();
+            document.getElementById('editRowNumber').value = '';
+            document.getElementById('otherDiagnosisGroup').style.display = 'none';
+            document.getElementById('submitBtn').textContent = '💾 บันทึกข้อมูล';
+            document.getElementById('cancelBtn').style.display = 'none';
+            calculateResults();
+            setDefaultDate();
+        }
+
+        function editPatient(rowNumber) {
+            const patient = patients.find(p => p.rowNumber == rowNumber);
+            if (!patient) return;
+
+            document.getElementById('editRowNumber').value = patient.rowNumber;
+            document.getElementById('recordDate').value = patient.recordDate || '';
+            document.getElementById('hn').value = patient.hn || '';
+            document.getElementById('firstName').value = patient.firstName || '';
+            document.getElementById('lastName').value = patient.lastName || '';
+            document.getElementById('ward').value = patient.ward || '';
+            
+            const standardDiagnoses = ['Stroke', "Parkinson's Disease", "Alzheimer's Disease", 'Epilepsy', 
+                                       'Multiple Sclerosis', 'Brain Tumor', 'Meningitis', 'Encephalitis', 'Migraine'];
+            
+            if (standardDiagnoses.includes(patient.diagnosis)) {
+                document.getElementById('diagnosis').value = patient.diagnosis;
+            } else {
+                document.getElementById('diagnosis').value = 'อื่นๆ';
+                document.getElementById('otherDiagnosis').value = patient.diagnosis;
+                toggleOtherDiagnosis();
+            }
+
+            setChronicDiseases(patient.chronicDiseases);
+            document.getElementById('nafScore').value = patient.nafScore || '';
+            document.getElementById('weight').value = patient.weight || '';
+            document.getElementById('height').value = patient.height || '';
+            document.getElementById('albumin').value = patient.albumin || '';
+            document.getElementById('totalProtein').value = patient.totalProtein || '';
+            document.getElementById('followUpDate').value = patient.followUpDate || '';
+            document.getElementById('followUpResult').value = patient.followUpResult || '';
+            document.getElementById('followUpDetails').value = patient.followUpDetails || '';
+
+            calculateResults();
+            
+            document.getElementById('submitBtn').textContent = '💾 บันทึกการแก้ไข';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            
+            showPage('form');
+        }
+
+        function deletePatient(rowNumber) {
+            const patient = patients.find(p => p.rowNumber == rowNumber);
+            if (!patient) return;
+
+            deleteRowNumber = rowNumber;
+            document.getElementById('deletePatientName').textContent = 
+                `${patient.firstName} ${patient.lastName} (HN: ${patient.hn})`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteRowNumber = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteRowNumber) return;
+
+            showLoading(true);
+            closeDeleteModal();
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'delete',
+                        rowNumber: deleteRowNumber
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showAlert('ลบข้อมูลสำเร็จ! 🗑️', 'success');
+                    await loadAllData();
+                } else {
+                    showAlert('เกิดข้อผิดพลาดในการลบข้อมูล', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function renderTable() {
+            const container = document.getElementById('tableContainer');
+            if (patients.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">ยังไม่มีข้อมูลผู้ป่วย</p>';
+                return;
+            }
+
+            let html = `
+                <div style="overflow-x: auto;">
+                <table>
                     <thead>
                         <tr>
                             <th>วันที่บันทึก</th>
@@ -526,611 +1085,233 @@
                             <th>ชื่อ-นามสกุล</th>
                             <th>หอผู้ป่วย</th>
                             <th>โรคหลัก</th>
-                            <th>NAF Score</th>
+                            <th>NAF</th>
                             <th>BMI</th>
                             <th>Albumin</th>
-                            <th>สถานะ</th>
+                            <th>สถานะติดตาม</th>
+                            <th>จัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="dataTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <script>
-        // ⚠️ สำคัญ: เปลี่ยน URL นี้เป็น URL ของ Google Apps Script ของคุณ
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
-        
-        let allData = [];
-        let charts = {};
+                    <tbody>
+            `;
 
-        // Switch Tab
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(function(tab) {
-                tab.classList.remove('active');
+            patients.forEach(patient => {
+                const bmi = patient.weight && patient.height ? 
+                    (patient.weight / Math.pow(patient.height / 100, 2)).toFixed(2) : '-';
+                const fullName = `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
+                const followUpStatus = patient.followUpResult || 'ยังไม่ติดตาม';
+                const recordDate = patient.recordDate ? new Date(patient.recordDate).toLocaleDateString('th-TH') : '-';
+                
+                html += `
+                    <tr>
+                        <td>${recordDate}</td>
+                        <td>${patient.hn || '-'}</td>
+                        <td>${fullName}</td>
+                        <td>${patient.ward || '-'}</td>
+                        <td>${patient.diagnosis || '-'}</td>
+                        <td>${patient.nafScore || '-'}</td>
+                        <td>${bmi}</td>
+                        <td>${patient.albumin || '-'}</td>
+                        <td>${followUpStatus}</td>
+                        <td style="white-space: nowrap;">
+                            <button class="btn btn-warning" onclick="editPatient(${patient.rowNumber})" style="padding: 5px 10px; margin: 2px;">✏️</button>
+                            <button class="btn btn-danger" onclick="deletePatient(${patient.rowNumber})" style="padding: 5px 10px; margin: 2px;">🗑️</button>
+                        </td>
+                    </tr>
+                `;
             });
-            document.querySelectorAll('.nav-tab').forEach(function(tab) {
-                tab.classList.remove('active');
-            });
-            
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
 
-            if (tabName === 'dashboard') {
-                loadDashboard();
-            } else if (tabName === 'data') {
-                loadTableData();
-            }
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
         }
 
-        // Set default date
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelector('input[name="recordDate"]').value = today;
-        });
+        function updateDashboard() {
+            const total = patients.length;
+            const needFollowUp = patients.filter(p => 
+                !p.followUpDate || p.followUpResult === 'ต้องติดตามต่อเนื่อง'
+            ).length;
+            const followedUp = patients.filter(p => 
+                p.followUpDate && p.followUpResult && p.followUpResult !== 'ต้องติดตามต่อเนื่อง'
+            ).length;
 
-        // Calculate NAF Score Result
-        function calculateNAF() {
-            const score = parseInt(document.querySelector('input[name="nafScore"]').value) || 0;
-            const resultDiv = document.getElementById('nafResult');
-            
-            let status, className, followUp = '';
-            
-            if (score >= 0 && score <= 5) {
-                status = 'Normal - Mild Malnutrition (ไม่พบความเสี่ยง-พบภาวะทุพโภชนาการเล็กน้อย)';
-                className = 'normal';
-            } else if (score >= 6 && score <= 10) {
-                status = 'Moderate Malnutrition (ภาวะทุพโภชนาการปานกลาง)';
-                className = 'warning';
-                followUp = ' - ⚠️ ต้องติดตาม';
-            } else if (score >= 11) {
-                status = 'Severe Malnutrition (ภาวะทุพโภชนาการรุนแรง)';
-                className = 'danger';
-                followUp = ' - ⚠️ ต้องติดตาม';
-            }
-            
-            resultDiv.className = 'result-item ' + className;
-            resultDiv.innerHTML = '<span>ผลการคัดกรอง NAF (คะแนน ' + score + '):</span><strong>' + status + followUp + '</strong>';
-        }
-
-        // Calculate BMI
-        function calculateBMI() {
-            const weight = parseFloat(document.querySelector('input[name="weight"]').value);
-            const height = parseFloat(document.querySelector('input[name="height"]').value);
-            
-            if (weight && height) {
-                const bmi = weight / Math.pow(height / 100, 2);
-                const resultDiv = document.getElementById('bmiResult');
-                
-                let status, className;
-                if (bmi < 18.5) {
-                    status = 'ผอม (Underweight)';
-                    className = 'warning';
-                } else if (bmi >= 18.5 && bmi < 23) {
-                    status = 'ปกติ (Normal)';
-                    className = 'normal';
-                } else if (bmi >= 23 && bmi < 25) {
-                    status = 'น้ำหนักเกิน (Overweight)';
-                    className = 'warning';
-                } else if (bmi >= 25 && bmi < 30) {
-                    status = 'อ้วน (Obese I)';
-                    className = 'danger';
-                } else {
-                    status = 'อ้วนมาก (Obese II)';
-                    className = 'danger';
-                }
-                
-                resultDiv.className = 'result-item ' + className;
-                resultDiv.innerHTML = '<span>BMI:</span><strong>' + bmi.toFixed(2) + ' - ' + status + '</strong>';
-            }
-        }
-
-        // Check Albumin
-        function checkAlbumin() {
-            const albumin = parseFloat(document.querySelector('input[name="albumin"]').value);
-            const resultDiv = document.getElementById('albuminResult');
-            
-            if (albumin) {
-                let status, className;
-                if (albumin < 3.5) {
-                    status = 'ต่ำ (Low)';
-                    className = 'danger';
-                } else if (albumin >= 3.5 && albumin <= 5.2) {
-                    status = 'ปกติ (Normal)';
-                    className = 'normal';
-                } else {
-                    status = 'สูง (High)';
-                    className = 'warning';
-                }
-                
-                resultDiv.className = 'result-item ' + className;
-                resultDiv.innerHTML = '<span>Albumin:</span><strong>' + albumin.toFixed(1) + ' g/dL - ' + status + ' (เกณฑ์ปกติ: 3.5-5.2)</strong>';
-            }
-        }
-
-        // Check Total Protein
-        function checkTotalProtein() {
-            const protein = parseFloat(document.querySelector('input[name="totalProtein"]').value);
-            const resultDiv = document.getElementById('proteinResult');
-            
-            if (protein) {
-                let status, className;
-                if (protein < 6.6) {
-                    status = 'ต่ำ (Low)';
-                    className = 'danger';
-                } else if (protein >= 6.6 && protein <= 8.3) {
-                    status = 'ปกติ (Normal)';
-                    className = 'normal';
-                } else {
-                    status = 'สูง (High)';
-                    className = 'warning';
-                }
-                
-                resultDiv.className = 'result-item ' + className;
-                resultDiv.innerHTML = '<span>Total Protein:</span><strong>' + protein.toFixed(1) + ' g/dL - ' + status + ' (เกณฑ์ปกติ: 6.6-8.3)</strong>';
-            }
-        }
-
-        // Form Submit
-        document.getElementById('patientForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const data = {};
-            
-            formData.forEach(function(value, key) {
-                if (key !== 'chronic') {
-                    data[key] = value;
-                }
-            });
-            
-            const chronicDiseases = [];
-            document.querySelectorAll('input[name="chronic"]:checked').forEach(function(cb) {
-                chronicDiseases.push(cb.value);
-            });
-            if (data.otherChronic) {
-                chronicDiseases.push(data.otherChronic);
-            }
-            data.chronicDiseases = chronicDiseases.join(', ');
-            
-            const weight = parseFloat(data.weight);
-            const height = parseFloat(data.height);
-            data.bmi = (weight / Math.pow(height / 100, 2)).toFixed(2);
-            
-            const nafScore = parseInt(data.nafScore);
-            const hasFollowUpResult = data.followUpResult && data.followUpResult !== '';
-            
-            if (hasFollowUpResult) {
-                data.isFollowed = 'Yes';
-            } else if (nafScore >= 6) {
-                data.isFollowed = 'No';
-            } else {
-                data.isFollowed = 'Pending';
-            }
-            
-            data.createdAt = new Date().toISOString();
-            
-            Swal.fire({
-                title: 'กำลังบันทึกข้อมูล...',
-                html: 'กรุณารอสักครู่',
-                allowOutsideClick: false,
-                didOpen: function() {
-                    Swal.showLoading();
-                }
-            });
-            
-            sendDataToGoogleSheet(data).then(function() {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'บันทึกสำเร็จ!',
-                    text: 'ข้อมูลผู้ป่วยถูกบันทึกเรียบร้อยแล้ว',
-                    confirmButtonText: 'ตกลง'
-                });
-                
-                e.target.reset();
-                const today = new Date().toISOString().split('T')[0];
-                document.querySelector('input[name="recordDate"]').value = today;
-                
-                document.getElementById('assessmentResults').querySelectorAll('.result-item').forEach(function(item) {
-                    item.className = 'result-item';
-                    const strong = item.querySelector('strong');
-                    if (strong) strong.textContent = '-';
-                });
-                
-            }).catch(function(error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
-                    confirmButtonText: 'ตกลง'
-                });
-                console.error('Error:', error);
-            });
-        });
-
-        // Send data using JSONP
-        function sendDataToGoogleSheet(data) {
-            return new Promise(function(resolve, reject) {
-                const callbackName = 'jsonpCallback_' + Date.now();
-                const script = document.createElement('script');
-                const params = new URLSearchParams(data).toString();
-                
-                window[callbackName] = function(response) {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    
-                    if (response.result === 'success') {
-                        resolve(response);
-                    } else {
-                        reject(new Error(response.error || 'Unknown error'));
-                    }
-                };
-                
-                script.src = SCRIPT_URL + '?' + params + '&callback=' + callbackName + '&timestamp=' + Date.now();
-                script.onerror = function() {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    reject(new Error('Network error'));
-                };
-                
-                document.body.appendChild(script);
-            });
-        }
-
-        // Load Dashboard
-        function loadDashboard() {
-            console.log('Loading dashboard...');
-            
-            if (allData.length === 0) {
-                console.log('No data in memory, loading from server...');
-                
-                loadTableData().then(function(data) {
-                    console.log('Data loaded for dashboard:', data.length, 'records');
-                    
-                    if (data.length === 0) {
-                        console.log('No data available');
-                        document.getElementById('totalPatients').textContent = '0';
-                        document.getElementById('needFollowUp').textContent = '0';
-                        document.getElementById('followed').textContent = '0';
-                        return;
-                    }
-                    
-                    updateDashboardStats(data);
-                    createAllCharts();
-                    
-                }).catch(function(error) {
-                    console.error('Failed to load data for dashboard:', error);
-                    document.getElementById('totalPatients').textContent = 'Error';
-                    document.getElementById('needFollowUp').textContent = 'Error';
-                    document.getElementById('followed').textContent = 'Error';
-                });
-                
-            } else {
-                console.log('Using cached data:', allData.length, 'records');
-                updateDashboardStats(allData);
-                createAllCharts();
-            }
-        }
-
-        function updateDashboardStats(data) {
-            const totalPatients = data.length;
-            const needFollowUp = data.filter(function(d) { return d.isFollowed === 'No'; }).length;
-            const followed = data.filter(function(d) { return d.isFollowed === 'Yes'; }).length;
-            
-            document.getElementById('totalPatients').textContent = totalPatients;
+            document.getElementById('totalPatients').textContent = total;
             document.getElementById('needFollowUp').textContent = needFollowUp;
-            document.getElementById('followed').textContent = followed;
+            document.getElementById('followedUp').textContent = followedUp;
+
+            renderTop5Diagnosis();
+            renderTop5Chronic();
+            renderCharts();
         }
 
-        function createAllCharts() {
-            createNAFChart();
-            createWardChart();
-            createBMIChart();
-            createAlbuminChart();
-            createProteinChart();
-        }
-
-        // Load Table Data
-        function loadTableData() {
-            return new Promise(function(resolve, reject) {
-                const loading = document.getElementById('tableLoading');
-                const table = document.getElementById('dataTable');
-                const tbody = document.getElementById('dataTableBody');
-                
-                loading.style.display = 'block';
-                loading.innerHTML = '<div class="spinner"></div><p>กำลังโหลดข้อมูล...</p>';
-                table.style.display = 'none';
-                
-                const oldScript = document.getElementById('jsonp-script');
-                if (oldScript) {
-                    document.body.removeChild(oldScript);
-                }
-                
-                const callbackName = 'jsonpCallback_getData_' + Date.now();
-                
-                console.log('Creating callback:', callbackName);
-                
-                const timeoutId = setTimeout(function() {
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                        const script = document.getElementById('jsonp-script');
-                        if (script) {
-                            document.body.removeChild(script);
-                        }
-                        loading.innerHTML = '<p style="color: red;">หมดเวลาในการโหลดข้อมูล<br><button class="btn-primary" style="margin-top: 20px;" onclick="loadTableData()">ลองใหม่</button></p>';
-                        reject(new Error('Timeout'));
-                    }
-                }, 15000);
-                
-                window[callbackName] = function(response) {
-                    try {
-                        clearTimeout(timeoutId);
-                        
-                        console.log('Callback received:', response);
-                        
-                        delete window[callbackName];
-                        const script = document.getElementById('jsonp-script');
-                        if (script && script.parentNode) {
-                            document.body.removeChild(script);
-                        }
-                        
-                        if (response.result === 'success') {
-                            allData = response.data || [];
-                            
-                            console.log('Data loaded successfully:', allData.length, 'records');
-                            
-                            tbody.innerHTML = '';
-                            
-                            if (allData.length === 0) {
-                                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #666;">ยังไม่มีข้อมูลผู้ป่วย<br><button class="btn-primary" style="margin-top: 20px;" onclick="switchTab(\'form\')">เพิ่มผู้ป่วยใหม่</button></td></tr>';
-                            } else {
-                                allData.forEach(function(row) {
-                                    const tr = document.createElement('tr');
-                                    
-                                    const nafScore = parseInt(row.nafScore) || 0;
-                                    const nafBadge = nafScore >= 6 ? 'badge-danger' : 'badge-success';
-                                    
-                                    let followBadge = 'badge-warning';
-                                    if (row.isFollowed === 'Yes') followBadge = 'badge-success';
-                                    else if (row.isFollowed === 'No') followBadge = 'badge-danger';
-                                    
-                                    let displayDate = row.recordDate || '-';
-                                    if (displayDate !== '-' && displayDate) {
-                                        try {
-                                            const date = new Date(displayDate);
-                                            if (!isNaN(date.getTime())) {
-                                                displayDate = date.toLocaleDateString('th-TH', {
-                                                    year: 'numeric',
-                                                    month: 'short',
-                                                    day: 'numeric'
-                                                });
-                                            }
-                                        } catch (e) {}
-                                    }
-                                    
-                                    const fullName = ((row.firstName || '') + ' ' + (row.lastName || '')).trim() || '-';
-                                    
-                                    tr.innerHTML = '<td>' + displayDate + '</td>' +
-                                        '<td>' + (row.hn || '-') + '</td>' +
-                                        '<td>' + fullName + '</td>' +
-                                        '<td>' + (row.ward || '-') + '</td>' +
-                                        '<td>' + (row.mainDiagnosis || '-') + '</td>' +
-                                        '<td><span class="badge ' + nafBadge + '">' + (row.nafScore || '-') + '</span></td>' +
-                                        '<td>' + (row.bmi || '-') + '</td>' +
-                                        '<td>' + (row.albumin || '-') + '</td>' +
-                                        '<td><span class="badge ' + followBadge + '">' + (row.isFollowed || '-') + '</span></td>';
-                                    
-                                    tbody.appendChild(tr);
-                                });
-                            }
-                            
-                            loading.style.display = 'none';
-                            table.style.display = 'table';
-                            
-                            resolve(allData);
-                            
-                        } else {
-                            throw new Error(response.error || 'Unknown error');
-                        }
-                        
-                    } catch (error) {
-                        clearTimeout(timeoutId);
-                        console.error('Error in callback:', error);
-                        loading.innerHTML = '<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '<br><button class="btn-primary" style="margin-top: 20px;" onclick="loadTableData()">ลองใหม่</button></p>';
-                        reject(error);
-                    }
-                };
-                
-                const script = document.createElement('script');
-                script.id = 'jsonp-script';
-                script.src = SCRIPT_URL + '?action=getData&callback=' + callbackName + '&timestamp=' + Date.now();
-                
-                console.log('Loading from:', script.src);
-                
-                script.onerror = function() {
-                    clearTimeout(timeoutId);
-                    delete window[callbackName];
-                    if (script.parentNode) {
-                        document.body.removeChild(script);
-                    }
-                    console.error('Script load error');
-                    loading.innerHTML = '<p style="color: red;">ไม่สามารถเชื่อมต่อกับ Google Sheets ได้<br><button class="btn-primary" style="margin-top: 20px;" onclick="loadTableData()">ลองใหม่</button></p>';
-                    reject(new Error('Script load error'));
-                };
-                
-                document.body.appendChild(script);
-            });
-        }
-
-        // Create Charts
-        function createNAFChart() {
-            const ctx = document.getElementById('nafChart').getContext('2d');
-            
-            const nafCounts = {
-                'Normal (0-5)': 0,
-                'Moderate (6-10)': 0,
-                'Severe (≥11)': 0
-            };
-            
-            allData.forEach(function(d) {
-                const score = parseInt(d.nafScore) || 0;
-                if (score >= 0 && score <= 5) nafCounts['Normal (0-5)']++;
-                else if (score >= 6 && score <= 10) nafCounts['Moderate (6-10)']++;
-                else if (score >= 11) nafCounts['Severe (≥11)']++;
-            });
-            
-            if (charts.nafChart) charts.nafChart.destroy();
-            
-            charts.nafChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(nafCounts),
-                    datasets: [{
-                        data: Object.values(nafCounts),
-                        backgroundColor: ['#4ade80', '#fbbf24', '#ef4444']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+        function renderTop5Diagnosis() {
+            const diagnosisCounts = {};
+            patients.forEach(p => {
+                if (p.diagnosis) {
+                    diagnosisCounts[p.diagnosis] = (diagnosisCounts[p.diagnosis] || 0) + 1;
                 }
             });
+
+            const sorted = Object.entries(diagnosisCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const container = document.getElementById('top5Diagnosis');
+            if (sorted.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">ยังไม่มีข้อมูล</p>';
+                return;
+            }
+
+            let html = '';
+            sorted.forEach(([diagnosis, count], index) => {
+                html += `
+                    <div class="top5-item">
+                        <span class="top5-rank">#${index + 1}</span>
+                        <span class="top5-name">${diagnosis}</span>
+                        <span class="top5-count">${count}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
-        function createWardChart() {
-            const ctx = document.getElementById('wardChart').getContext('2d');
-            
-            const wardCounts = {};
-            allData.forEach(function(d) {
-                wardCounts[d.ward] = (wardCounts[d.ward] || 0) + 1;
-            });
-            
-            if (charts.wardChart) charts.wardChart.destroy();
-            
-            charts.wardChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(wardCounts),
-                    datasets: [{
-                        label: 'จำนวนผู้ป่วย',
-                        data: Object.values(wardCounts),
-                        backgroundColor: '#667eea'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+        function renderTop5Chronic() {
+            const chronicCounts = {};
+            patients.forEach(p => {
+                if (p.chronicDiseases) {
+                    const diseases = p.chronicDiseases.split(',').map(d => d.trim()).filter(d => d);
+                    diseases.forEach(disease => {
+                        chronicCounts[disease] = (chronicCounts[disease] || 0) + 1;
+                    });
                 }
             });
+
+            const sorted = Object.entries(chronicCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const container = document.getElementById('top5Chronic');
+            if (sorted.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">ยังไม่มีข้อมูล</p>';
+                return;
+            }
+
+            let html = '';
+            sorted.forEach(([disease, count], index) => {
+                html += `
+                    <div class="top5-item">
+                        <span class="top5-rank">#${index + 1}</span>
+                        <span class="top5-name">${disease}</span>
+                        <span class="top5-count">${count}</span>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
-        function createBMIChart() {
-            const ctx = document.getElementById('bmiChart').getContext('2d');
+        function renderCharts() {
+            const container = document.getElementById('chartsContainer');
             
-            const bmiCounts = {
-                'ผอม (<18.5)': 0,
-                'ปกติ (18.5-22.9)': 0,
-                'น้ำหนักเกิน (23-24.9)': 0,
-                'อ้วน (≥25)': 0
-            };
-            
-            allData.forEach(function(d) {
-                const bmi = parseFloat(d.bmi);
-                if (bmi < 18.5) bmiCounts['ผอม (<18.5)']++;
-                else if (bmi >= 18.5 && bmi < 23) bmiCounts['ปกติ (18.5-22.9)']++;
-                else if (bmi >= 23 && bmi < 25) bmiCounts['น้ำหนักเกิน (23-24.9)']++;
-                else if (bmi >= 25) bmiCounts['อ้วน (≥25)']++;
+            const nafGroups = { 'ต่ำ (<6)': 0, 'ปานกลาง (6-9)': 0, 'สูง (≥10)': 0 };
+            patients.forEach(p => {
+                const score = parseFloat(p.nafScore);
+                if (score >= 10) nafGroups['สูง (≥10)']++;
+                else if (score >= 6) nafGroups['ปานกลาง (6-9)']++;
+                else if (score >= 0) nafGroups['ต่ำ (<6)']++;
             });
-            
-            if (charts.bmiChart) charts.bmiChart.destroy();
-            
-            charts.bmiChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(bmiCounts),
-                    datasets: [{
-                        data: Object.values(bmiCounts),
-                        backgroundColor: ['#60a5fa', '#4ade80', '#fbbf24', '#ef4444']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
+
+            const wardGroups = {};
+            patients.forEach(p => {
+                if (p.ward) {
+                    wardGroups[p.ward] = (wardGroups[p.ward] || 0) + 1;
                 }
             });
-        }
 
-        function createAlbuminChart() {
-            const ctx = document.getElementById('albuminChart').getContext('2d');
-            
-            const albuminData = allData.filter(function(d) { return d.albumin; }).map(function(d) { return parseFloat(d.albumin); });
-            const albuminCounts = {
-                'ต่ำ (<3.5)': albuminData.filter(function(v) { return v < 3.5; }).length,
-                'ปกติ (3.5-5.2)': albuminData.filter(function(v) { return v >= 3.5 && v <= 5.2; }).length,
-                'สูง (>5.2)': albuminData.filter(function(v) { return v > 5.2; }).length
-            };
-            
-            if (charts.albuminChart) charts.albuminChart.destroy();
-            
-            charts.albuminChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(albuminCounts),
-                    datasets: [{
-                        label: 'จำนวนผู้ป่วย',
-                        data: Object.values(albuminCounts),
-                        backgroundColor: ['#ef4444', '#4ade80', '#fbbf24']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+            const bmiGroups = { 'ผอม': 0, 'ปกติ': 0, 'น้ำหนักเกิน': 0, 'โรคอ้วน': 0 };
+            patients.forEach(p => {
+                if (p.weight && p.height) {
+                    const bmi = p.weight / Math.pow(p.height / 100, 2);
+                    if (bmi < 18.5) bmiGroups['ผอม']++;
+                    else if (bmi < 23) bmiGroups['ปกติ']++;
+                    else if (bmi < 25) bmiGroups['น้ำหนักเกิน']++;
+                    else bmiGroups['โรคอ้วน']++;
                 }
             });
-        }
 
-        function createProteinChart() {
-            const ctx = document.getElementById('proteinChart').getContext('2d');
-            
-            const proteinData = allData.filter(function(d) { return d.totalProtein; }).map(function(d) { return parseFloat(d.totalProtein); });
-            const proteinCounts = {
-                'ต่ำ (<6.6)': proteinData.filter(function(v) { return v < 6.6; }).length,
-                'ปกติ (6.6-8.3)': proteinData.filter(function(v) { return v >= 6.6 && v <= 8.3; }).length,
-                'สูง (>8.3)': proteinData.filter(function(v) { return v > 8.3; }).length
-            };
-            
-            if (charts.proteinChart) charts.proteinChart.destroy();
-            
-            charts.proteinChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(proteinCounts),
-                    datasets: [{
-                        label: 'จำนวนผู้ป่วย',
-                        data: Object.values(proteinCounts),
-                        backgroundColor: ['#ef4444', '#4ade80', '#fbbf24']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
+            const albuminGroups = { 'ปกติ (≥3.5)': 0, 'ต่ำเล็กน้อย (3.0-3.4)': 0, 'ต่ำ (<3.0)': 0, 'ไม่มีข้อมูล': 0 };
+            patients.forEach(p => {
+                const alb = parseFloat(p.albumin);
+                if (!alb) albuminGroups['ไม่มีข้อมูล']++;
+                else if (alb >= 3.5) albuminGroups['ปกติ (≥3.5)']++;
+                else if (alb >= 3.0) albuminGroups['ต่ำเล็กน้อย (3.0-3.4)']++;
+                else albuminGroups['ต่ำ (<3.0)']++;
             });
+
+            const proteinGroups = { 'ปกติ (6.0-8.3)': 0, 'ต่ำ (<6.0)': 0, 'สูง (>8.3)': 0, 'ไม่มีข้อมูล': 0 };
+            patients.forEach(p => {
+                const tp = parseFloat(p.totalProtein);
+                if (!tp) proteinGroups['ไม่มีข้อมูล']++;
+                else if (tp >= 6.0 && tp <= 8.3) proteinGroups['ปกติ (6.0-8.3)']++;
+                else if (tp < 6.0) proteinGroups['ต่ำ (<6.0)']++;
+                else proteinGroups['สูง (>8.3)']++;
+            });
+
+            let html = `
+                <div class="chart-container">
+                    <h3>ภาวะโภชนาการ (NAF Score)</h3>
+                    ${renderBarChart(nafGroups)}
+                </div>
+                <div class="chart-container">
+                    <h3>จำนวนผู้ป่วยแยกตามหอ</h3>
+                    ${renderBarChart(wardGroups)}
+                </div>
+                <div class="chart-container">
+                    <h3>สัดส่วนค่า BMI</h3>
+                    ${renderBarChart(bmiGroups)}
+                </div>
+                <div class="chart-container">
+                    <h3>ค่า Albumin</h3>
+                    ${renderBarChart(albuminGroups)}
+                </div>
+                <div class="chart-container">
+                    <h3>ค่า Total Protein</h3>
+                    ${renderBarChart(proteinGroups)}
+                </div>
+            `;
+
+            container.innerHTML = html;
         }
 
-        // Download Chart
-        function downloadChart(chartId) {
-            const canvas = document.getElementById(chartId);
-            const url = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = chartId + '_' + new Date().getTime() + '.png';
-            link.href = url;
-            link.click();
+        function renderBarChart(data) {
+            const max = Math.max(...Object.values(data));
+            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+            
+            for (const [label, value] of Object.entries(data)) {
+                const percentage = max > 0 ? (value / max) * 100 : 0;
+                html += `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 180px; font-size: 14px; flex-shrink: 0;">${label}</div>
+                        <div style="flex: 1; background: #e9ecef; border-radius: 5px; height: 30px; position: relative;">
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${percentage}%; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; min-width: 30px;">
+                                ${value > 0 ? value : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alertContainer');
+            const alertClass = type === 'success' ? 'alert-success' : 
+                               type === 'warning' ? 'alert-warning' : 
+                               type === 'info' ? 'alert-info' : 'alert-danger';
+            container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
         }
     </script>
 </body>
