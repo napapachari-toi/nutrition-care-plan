@@ -248,11 +248,43 @@
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .chart-container h3 {
             color: #333;
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto;
         }
 
         table {
@@ -767,7 +799,7 @@
 
     <script>
         // ⚠️ สำคัญ: แทนที่ URL ด้านล่างนี้ด้วย Web App URL ของคุณจาก Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT63XP7ugf7QovhgCLtfA3QWLeEr06ibZAlZKZQYtyDuCx1jjvP6xWIH0sQqR4xSps/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
         
         let patients = [];
         let deleteRowNumber = null;
@@ -1255,117 +1287,182 @@
                 else proteinGroups['สูง (>8.3)']++;
             });
 
-            let html = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
-                    <div class="chart-container">
-                        <h3>ภาวะโภชนาการ (NAF Score)</h3>
-                        ${renderPieChart(nafGroups, ['#FF6384', '#FFCE56', '#36A2EB'])}
-                    </div>
-                    <div class="chart-container">
-                        <h3>จำนวนผู้ป่วยแยกตามหอ</h3>
-                        ${renderPieChart(wardGroups, ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'])}
-                    </div>
-                    <div class="chart-container">
-                        <h3>สัดส่วนค่า BMI</h3>
-                        ${renderPieChart(bmiGroups, ['#4facfe', '#00f2fe', '#feca57', '#ee5a6f'])}
-                    </div>
-                    <div class="chart-container">
-                        <h3>ค่า Albumin</h3>
-                        ${renderPieChart(albuminGroups, ['#43e97b', '#FFCE56', '#FF6384', '#cccccc'])}
-                    </div>
-                    <div class="chart-container">
-                        <h3>ค่า Total Protein</h3>
-                        ${renderPieChart(proteinGroups, ['#00f2fe', '#4facfe', '#f093fb', '#cccccc'])}
-                    </div>
-                </div>
-            `;
+            const charts = [
+                { title: 'ภาวะโภชนาการ (NAF Score)', data: nafGroups, colors: ['#FF6B9D', '#FEC163', '#4ECDC4'], id: 'nafChart' },
+                { title: 'จำนวนผู้ป่วยแยกตามหอ', data: wardGroups, colors: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'], id: 'wardChart' },
+                { title: 'สัดส่วนค่า BMI', data: bmiGroups, colors: ['#A8E6CF', '#FFD93D', '#FFB347', '#FF6B6B'], id: 'bmiChart' },
+                { title: 'ค่า Albumin', data: albuminGroups, colors: ['#6BCF7F', '#FFE66D', '#FF6B9D', '#C7CEEA'], id: 'albuminChart' },
+                { title: 'ค่า Total Protein', data: proteinGroups, colors: ['#4ECDC4', '#45B7D1', '#FEA47F', '#D4D4D4'], id: 'proteinChart' }
+            ];
 
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">';
+            
+            charts.forEach(chart => {
+                html += `
+                    <div class="chart-container">
+                        <h3>
+                            <span>${chart.title}</span>
+                            <button class="download-btn" onclick="downloadChart('${chart.id}', '${chart.title}')">
+                                📥 ดาวน์โหลด
+                            </button>
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="${chart.id}" width="350" height="350"></canvas>
+                            <div id="${chart.id}_legend" style="margin-top: 20px; width: 100%;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
             container.innerHTML = html;
+
+            // วาดกราฟทั้งหมด
+            setTimeout(() => {
+                charts.forEach(chart => {
+                    drawPieChart(chart.id, chart.data, chart.colors);
+                });
+            }, 100);
         }
 
-        function renderPieChart(data, colors) {
+        function drawPieChart(canvasId, data, colors) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - 20;
+            const radius = 120;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             const total = Object.values(data).reduce((sum, val) => sum + val, 0);
             
             if (total === 0) {
-                return '<p style="text-align: center; color: #666; padding: 40px;">ไม่มีข้อมูล</p>';
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#999';
+                ctx.textAlign = 'center';
+                ctx.fillText('ไม่มีข้อมูล', centerX, centerY);
+                return;
             }
-
+            
             const entries = Object.entries(data).filter(([_, value]) => value > 0);
+            let currentAngle = -Math.PI / 2;
             
-            let currentAngle = -90; // เริ่มจากด้านบน
-            let segments = [];
+            const segments = [];
             
+            // วาดแต่ละส่วนของกราฟ
             entries.forEach(([label, value], index) => {
-                const percentage = (value / total) * 100;
-                const angle = (value / total) * 360;
-                const endAngle = currentAngle + angle;
-                
+                const sliceAngle = (value / total) * 2 * Math.PI;
                 const color = colors[index % colors.length];
+                
+                // วาด slice พร้อมเงา
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                
+                // เพิ่มเงา
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                
+                ctx.fillStyle = color;
+                ctx.fill();
+                
+                // วาดขอบขาว
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+                
+                // คำนวณตำแหน่งข้อความ
+                const middleAngle = currentAngle + sliceAngle / 2;
+                const textX = centerX + (radius * 0.7) * Math.cos(middleAngle);
+                const textY = centerY + (radius * 0.7) * Math.sin(middleAngle);
+                
+                // วาดเปอร์เซ็นต์บนกราฟ
+                const percentage = ((value / total) * 100).toFixed(1);
+                if (percentage > 5) { // แสดงเฉพาะถ้าเปอร์เซ็นต์มากกว่า 5%
+                    ctx.save();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 3;
+                    ctx.fillText(`${percentage}%`, textX, textY);
+                    ctx.restore();
+                }
                 
                 segments.push({
                     label,
                     value,
-                    percentage: percentage.toFixed(1),
-                    startAngle: currentAngle,
-                    endAngle: endAngle,
+                    percentage,
                     color
                 });
                 
-                currentAngle = endAngle;
+                currentAngle += sliceAngle;
             });
-
-            // สร้าง SVG Pie Chart
-            let svgPaths = '';
-            segments.forEach(segment => {
-                const largeArc = (segment.endAngle - segment.startAngle) > 180 ? 1 : 0;
-                
-                const startRad = (segment.startAngle * Math.PI) / 180;
-                const endRad = (segment.endAngle * Math.PI) / 180;
-                
-                const x1 = 100 + 80 * Math.cos(startRad);
-                const y1 = 100 + 80 * Math.sin(startRad);
-                const x2 = 100 + 80 * Math.cos(endRad);
-                const y2 = 100 + 80 * Math.sin(endRad);
-                
-                svgPaths += `
-                    <path d="M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z"
-                          fill="${segment.color}"
-                          stroke="white"
-                          stroke-width="2"
-                          opacity="0.9"
-                          style="transition: opacity 0.3s;"
-                          onmouseover="this.style.opacity='1'"
-                          onmouseout="this.style.opacity='0.9'">
-                        <title>${segment.label}: ${segment.value} (${segment.percentage}%)</title>
-                    </path>
-                `;
-            });
-
+            
             // สร้าง Legend
-            let legend = '<div style="margin-top: 20px;">';
+            const legendDiv = document.getElementById(`${canvasId}_legend`);
+            let legendHTML = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+            
             segments.forEach(segment => {
-                legend += `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px; font-size: 14px;">
-                        <div style="width: 20px; height: 20px; background: ${segment.color}; border-radius: 3px; margin-right: 10px; flex-shrink: 0;"></div>
-                        <div style="flex: 1;">
-                            <strong>${segment.label}</strong>
+                legendHTML += `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: white; border-radius: 5px; border-left: 4px solid ${segment.color};">
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                            <div style="width: 16px; height: 16px; background: ${segment.color}; border-radius: 3px; flex-shrink: 0;"></div>
+                            <span style="font-size: 14px;"><strong>${segment.label}</strong></span>
                         </div>
-                        <div style="margin-left: 10px; color: #667eea; font-weight: bold;">
-                            ${segment.value} (${segment.percentage}%)
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #667eea; font-weight: bold; font-size: 16px;">${segment.value}</span>
+                            <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                                ${segment.percentage}%
+                            </span>
                         </div>
                     </div>
                 `;
             });
-            legend += '</div>';
+            
+            legendHTML += '</div>';
+            legendDiv.innerHTML = legendHTML;
+        }
 
-            return `
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                    <svg viewBox="0 0 200 200" style="max-width: 250px; height: auto; margin: 0 auto;">
-                        ${svgPaths}
-                    </svg>
-                    ${legend}
-                </div>
-            `;
+        function downloadChart(canvasId, title) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            // สร้าง canvas ใหม่ที่มีพื้นหลังสีขาว
+            const downloadCanvas = document.createElement('canvas');
+            downloadCanvas.width = canvas.width;
+            downloadCanvas.height = canvas.height;
+            const ctx = downloadCanvas.getContext('2d');
+            
+            // เพิ่มพื้นหลังสีขาว
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, downloadCanvas.width, downloadCanvas.height);
+            
+            // วาดกราฟลงไป
+            ctx.drawImage(canvas, 0, 0);
+            
+            // เพิ่มชื่อกราฟ
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, downloadCanvas.width / 2, 30);
+            
+            // ดาวน์โหลด
+            const link = document.createElement('a');
+            link.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = downloadCanvas.toDataURL('image/png');
+            link.click();
+            
+            showAlert(`ดาวน์โหลดกราฟ "${title}" สำเร็จ! 🎉`, 'success');
         }
 
         function showAlert(message, type) {
