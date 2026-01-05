@@ -767,7 +767,7 @@
 
     <script>
         // ⚠️ สำคัญ: แทนที่ URL ด้านล่างนี้ด้วย Web App URL ของคุณจาก Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT63XP7ugf7QovhgCLtfA3QWLeEr06ibZAlZKZQYtyDuCx1jjvP6xWIH0sQqR4xSps/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
         
         let patients = [];
         let deleteRowNumber = null;
@@ -1256,51 +1256,116 @@
             });
 
             let html = `
-                <div class="chart-container">
-                    <h3>ภาวะโภชนาการ (NAF Score)</h3>
-                    ${renderBarChart(nafGroups)}
-                </div>
-                <div class="chart-container">
-                    <h3>จำนวนผู้ป่วยแยกตามหอ</h3>
-                    ${renderBarChart(wardGroups)}
-                </div>
-                <div class="chart-container">
-                    <h3>สัดส่วนค่า BMI</h3>
-                    ${renderBarChart(bmiGroups)}
-                </div>
-                <div class="chart-container">
-                    <h3>ค่า Albumin</h3>
-                    ${renderBarChart(albuminGroups)}
-                </div>
-                <div class="chart-container">
-                    <h3>ค่า Total Protein</h3>
-                    ${renderBarChart(proteinGroups)}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+                    <div class="chart-container">
+                        <h3>ภาวะโภชนาการ (NAF Score)</h3>
+                        ${renderPieChart(nafGroups, ['#FF6384', '#FFCE56', '#36A2EB'])}
+                    </div>
+                    <div class="chart-container">
+                        <h3>จำนวนผู้ป่วยแยกตามหอ</h3>
+                        ${renderPieChart(wardGroups, ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'])}
+                    </div>
+                    <div class="chart-container">
+                        <h3>สัดส่วนค่า BMI</h3>
+                        ${renderPieChart(bmiGroups, ['#4facfe', '#00f2fe', '#feca57', '#ee5a6f'])}
+                    </div>
+                    <div class="chart-container">
+                        <h3>ค่า Albumin</h3>
+                        ${renderPieChart(albuminGroups, ['#43e97b', '#FFCE56', '#FF6384', '#cccccc'])}
+                    </div>
+                    <div class="chart-container">
+                        <h3>ค่า Total Protein</h3>
+                        ${renderPieChart(proteinGroups, ['#00f2fe', '#4facfe', '#f093fb', '#cccccc'])}
+                    </div>
                 </div>
             `;
 
             container.innerHTML = html;
         }
 
-        function renderBarChart(data) {
-            const max = Math.max(...Object.values(data));
-            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+        function renderPieChart(data, colors) {
+            const total = Object.values(data).reduce((sum, val) => sum + val, 0);
             
-            for (const [label, value] of Object.entries(data)) {
-                const percentage = max > 0 ? (value / max) * 100 : 0;
-                html += `
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 180px; font-size: 14px; flex-shrink: 0;">${label}</div>
-                        <div style="flex: 1; background: #e9ecef; border-radius: 5px; height: 30px; position: relative;">
-                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${percentage}%; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; min-width: 30px;">
-                                ${value > 0 ? value : ''}
-                            </div>
+            if (total === 0) {
+                return '<p style="text-align: center; color: #666; padding: 40px;">ไม่มีข้อมูล</p>';
+            }
+
+            const entries = Object.entries(data).filter(([_, value]) => value > 0);
+            
+            let currentAngle = -90; // เริ่มจากด้านบน
+            let segments = [];
+            
+            entries.forEach(([label, value], index) => {
+                const percentage = (value / total) * 100;
+                const angle = (value / total) * 360;
+                const endAngle = currentAngle + angle;
+                
+                const color = colors[index % colors.length];
+                
+                segments.push({
+                    label,
+                    value,
+                    percentage: percentage.toFixed(1),
+                    startAngle: currentAngle,
+                    endAngle: endAngle,
+                    color
+                });
+                
+                currentAngle = endAngle;
+            });
+
+            // สร้าง SVG Pie Chart
+            let svgPaths = '';
+            segments.forEach(segment => {
+                const largeArc = (segment.endAngle - segment.startAngle) > 180 ? 1 : 0;
+                
+                const startRad = (segment.startAngle * Math.PI) / 180;
+                const endRad = (segment.endAngle * Math.PI) / 180;
+                
+                const x1 = 100 + 80 * Math.cos(startRad);
+                const y1 = 100 + 80 * Math.sin(startRad);
+                const x2 = 100 + 80 * Math.cos(endRad);
+                const y2 = 100 + 80 * Math.sin(endRad);
+                
+                svgPaths += `
+                    <path d="M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z"
+                          fill="${segment.color}"
+                          stroke="white"
+                          stroke-width="2"
+                          opacity="0.9"
+                          style="transition: opacity 0.3s;"
+                          onmouseover="this.style.opacity='1'"
+                          onmouseout="this.style.opacity='0.9'">
+                        <title>${segment.label}: ${segment.value} (${segment.percentage}%)</title>
+                    </path>
+                `;
+            });
+
+            // สร้าง Legend
+            let legend = '<div style="margin-top: 20px;">';
+            segments.forEach(segment => {
+                legend += `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px; font-size: 14px;">
+                        <div style="width: 20px; height: 20px; background: ${segment.color}; border-radius: 3px; margin-right: 10px; flex-shrink: 0;"></div>
+                        <div style="flex: 1;">
+                            <strong>${segment.label}</strong>
+                        </div>
+                        <div style="margin-left: 10px; color: #667eea; font-weight: bold;">
+                            ${segment.value} (${segment.percentage}%)
                         </div>
                     </div>
                 `;
-            }
-            
-            html += '</div>';
-            return html;
+            });
+            legend += '</div>';
+
+            return `
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <svg viewBox="0 0 200 200" style="max-width: 250px; height: auto; margin: 0 auto;">
+                        ${svgPaths}
+                    </svg>
+                    ${legend}
+                </div>
+            `;
         }
 
         function showAlert(message, type) {
