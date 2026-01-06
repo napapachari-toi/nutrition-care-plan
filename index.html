@@ -799,7 +799,7 @@
 
     <script>
         // ⚠️ สำคัญ: แทนที่ URL ด้านล่างนี้ด้วย Web App URL ของคุณจาก Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT63XP7ugf7QovhgCLtfA3QWLeEr06ibZAlZKZQYtyDuCx1jjvP6xWIH0sQqR4xSps/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
         
         let patients = [];
         let deleteRowNumber = null;
@@ -851,10 +851,17 @@
             const totalProtein = parseFloat(document.getElementById('totalProtein').value) || 0;
 
             let nafResult = '-';
+            let needFollowUp = false;
             if (nafScore >= 0 && nafScore <= 15) {
-                if (nafScore >= 10) nafResult = 'มีความเสี่ยงสูง (≥10)';
-                else if (nafScore >= 6) nafResult = 'มีความเสี่ยงปานกลาง (6-9)';
-                else nafResult = 'มีความเสี่ยงต่ำ (<6)';
+                if (nafScore >= 11) {
+                    nafResult = 'Severe (≥11) - ต้องติดตาม';
+                    needFollowUp = true;
+                } else if (nafScore >= 6) {
+                    nafResult = 'Moderate (6-10) - ต้องติดตาม';
+                    needFollowUp = true;
+                } else {
+                    nafResult = 'มีความเสี่ยงต่ำ (<6)';
+                }
             }
 
             let bmiResult = '-';
@@ -887,6 +894,21 @@
             document.getElementById('bmiResult').textContent = bmiResult;
             document.getElementById('albuminResult').textContent = albuminResult;
             document.getElementById('totalProteinResult').textContent = totalProteinResult;
+            
+            // เปลี่ยนสีของ NAF Result
+            const nafResultElement = document.getElementById('nafResult');
+            if (needFollowUp) {
+                if (nafScore >= 11) {
+                    nafResultElement.style.color = '#dc3545'; // สีแดง
+                    nafResultElement.style.fontWeight = 'bold';
+                } else {
+                    nafResultElement.style.color = '#ffc107'; // สีเหลือง
+                    nafResultElement.style.fontWeight = 'bold';
+                }
+            } else {
+                nafResultElement.style.color = '#28a745'; // สีเขียว
+                nafResultElement.style.fontWeight = 'bold';
+            }
         }
 
         function getChronicDiseases() {
@@ -1159,11 +1181,16 @@
 
         function updateDashboard() {
             const total = patients.length;
-            const needFollowUp = patients.filter(p => 
-                !p.followUpDate || p.followUpResult === 'ต้องติดตามต่อเนื่อง'
-            ).length;
+            
+            // นับจำนวนที่ต้องติดตาม: NAF >= 6
+            const needFollowUp = patients.filter(p => {
+                const nafScore = parseFloat(p.nafScore);
+                return nafScore >= 6;
+            }).length;
+            
+            // นับจำนวนที่ติดตามแล้ว (มีการบันทึก follow up)
             const followedUp = patients.filter(p => 
-                p.followUpDate && p.followUpResult && p.followUpResult !== 'ต้องติดตามต่อเนื่อง'
+                p.followUpDate && p.followUpResult && p.followUpResult !== ''
             ).length;
 
             document.getElementById('totalPatients').textContent = total;
@@ -1243,11 +1270,12 @@
         function renderCharts() {
             const container = document.getElementById('chartsContainer');
             
-            const nafGroups = { 'ต่ำ (<6)': 0, 'ปานกลาง (6-9)': 0, 'สูง (≥10)': 0 };
+            // แบ่งกลุ่ม NAF ตามเกณฑ์ใหม่
+            const nafGroups = { 'ต่ำ (<6)': 0, 'Moderate (6-10)': 0, 'Severe (≥11)': 0 };
             patients.forEach(p => {
                 const score = parseFloat(p.nafScore);
-                if (score >= 10) nafGroups['สูง (≥10)']++;
-                else if (score >= 6) nafGroups['ปานกลาง (6-9)']++;
+                if (score >= 11) nafGroups['Severe (≥11)']++;
+                else if (score >= 6) nafGroups['Moderate (6-10)']++;
                 else if (score >= 0) nafGroups['ต่ำ (<6)']++;
             });
 
@@ -1288,7 +1316,7 @@
             });
 
             const charts = [
-                { title: 'ภาวะโภชนาการ (NAF Score)', data: nafGroups, colors: ['#FF6B9D', '#FEC163', '#4ECDC4'], id: 'nafChart' },
+                { title: 'ภาวะโภชนาการ (NAF Score)', data: nafGroups, colors: ['#A8E6CF', '#FFD93D', '#FF6B6B'], id: 'nafChart' },
                 { title: 'จำนวนผู้ป่วยแยกตามหอ', data: wardGroups, colors: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'], id: 'wardChart' },
                 { title: 'สัดส่วนค่า BMI', data: bmiGroups, colors: ['#A8E6CF', '#FFD93D', '#FFB347', '#FF6B6B'], id: 'bmiChart' },
                 { title: 'ค่า Albumin', data: albuminGroups, colors: ['#6BCF7F', '#FFE66D', '#FF6B9D', '#C7CEEA'], id: 'albuminChart' },
