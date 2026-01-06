@@ -259,6 +259,70 @@
             align-items: center;
         }
 
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            margin: 0;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .status-followed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         .download-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -275,16 +339,68 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
-        .chart-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        canvas {
-            max-width: 350px;
-            height: auto;
-            margin: 0 auto;
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            margin: 0;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .status-followed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         table {
@@ -493,6 +609,20 @@
         }
 
         @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
@@ -516,6 +646,34 @@
             .btn {
                 padding: 8px 15px;
                 font-size: 14px;
+            }
+        }
+
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
             }
         }
     </style>
@@ -743,6 +901,23 @@
             <div id="dashboard" class="page">
                 <h2 style="margin-bottom: 20px;">📊 Dashboard - ภาพรวมข้อมูลผู้ป่วย</h2>
                 
+                <!-- ส่วนกรองข้อมูล -->
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>🗓️ ตั้งแต่:</label>
+                            <input type="month" id="dashboardStartMonth" onchange="applyDashboardFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <label>ถึง:</label>
+                            <input type="month" id="dashboardEndMonth" onchange="applyDashboardFilter()">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyDashboardFilter()">🔍 กรองข้อมูล</button>
+                        <button class="btn btn-secondary" onclick="clearDashboardFilter()">🔄 รีเซ็ต</button>
+                    </div>
+                    <div id="dashboardFilterInfo" style="margin-top: 10px; color: #667eea; font-weight: bold;"></div>
+                </div>
+                
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-number" id="totalPatients">-</div>
@@ -776,9 +951,25 @@
             <!-- ตารางข้อมูล -->
             <div id="table" class="page">
                 <h2 style="margin-bottom: 20px;">📋 ตารางข้อมูลผู้ป่วยทั้งหมด</h2>
-                <div style="margin-bottom: 15px;">
-                    <button class="btn btn-success" onclick="loadAllData()">🔄 รีเฟรชข้อมูล</button>
+                
+                <!-- ส่วนกรองข้อมูล -->
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>🗓️ ตั้งแต่:</label>
+                            <input type="month" id="tableStartMonth" onchange="applyTableFilter()">
+                        </div>
+                        <div class="filter-group">
+                            <label>ถึง:</label>
+                            <input type="month" id="tableEndMonth" onchange="applyTableFilter()">
+                        </div>
+                        <button class="btn btn-primary" onclick="applyTableFilter()">🔍 กรองข้อมูล</button>
+                        <button class="btn btn-secondary" onclick="clearTableFilter()">🔄 รีเซ็ต</button>
+                        <button class="btn btn-success" onclick="loadAllData()">🔄 รีเฟรชข้อมูล</button>
+                    </div>
+                    <div id="tableFilterInfo" style="margin-top: 10px; color: #667eea; font-weight: bold;"></div>
                 </div>
+                
                 <div id="tableContainer"></div>
             </div>
         </div>
@@ -802,6 +993,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT63XP7ugf7QovhgCLtfA3QWLeEr06ibZAlZKZQYtyDuCx1jjvP6xWIH0sQqR4xSps/exec';
         
         let patients = [];
+        let filteredPatients = []; // สำหรับเก็บข้อมูลที่กรองแล้ว
         let deleteRowNumber = null;
 
         window.onload = function() {
@@ -959,6 +1151,7 @@
                 
                 if (data.status === 'success') {
                     patients = data.data;
+                    filteredPatients = patients; // เริ่มต้นด้วยข้อมูลทั้งหมด
                     renderTable();
                     updateDashboard();
                     showAlert('โหลดข้อมูลสำเร็จ! ✅', 'success');
@@ -971,6 +1164,84 @@
             } finally {
                 showLoading(false);
             }
+        }
+
+        // ฟังก์ชันกรองข้อมูลตามช่วงเวลา
+        function filterPatientsByDateRange(startMonth, endMonth) {
+            if (!startMonth && !endMonth) {
+                return patients;
+            }
+
+            return patients.filter(p => {
+                if (!p.recordDate) return false;
+                
+                const recordDate = new Date(p.recordDate);
+                const recordYearMonth = `${recordDate.getFullYear()}-${String(recordDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                if (startMonth && endMonth) {
+                    return recordYearMonth >= startMonth && recordYearMonth <= endMonth;
+                } else if (startMonth) {
+                    return recordYearMonth >= startMonth;
+                } else if (endMonth) {
+                    return recordYearMonth <= endMonth;
+                }
+                
+                return true;
+            });
+        }
+
+        // กรองข้อมูล Dashboard
+        function applyDashboardFilter() {
+            const startMonth = document.getElementById('dashboardStartMonth').value;
+            const endMonth = document.getElementById('dashboardEndMonth').value;
+            
+            filteredPatients = filterPatientsByDateRange(startMonth, endMonth);
+            updateDashboard();
+            
+            // แสดงข้อความ
+            const infoDiv = document.getElementById('dashboardFilterInfo');
+            if (startMonth || endMonth) {
+                const startText = startMonth ? new Date(startMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'เริ่มต้น';
+                const endText = endMonth ? new Date(endMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'ปัจจุบัน';
+                infoDiv.textContent = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText} (${filteredPatients.length} รายการ)`;
+            } else {
+                infoDiv.textContent = '';
+            }
+        }
+
+        function clearDashboardFilter() {
+            document.getElementById('dashboardStartMonth').value = '';
+            document.getElementById('dashboardEndMonth').value = '';
+            filteredPatients = patients;
+            updateDashboard();
+            document.getElementById('dashboardFilterInfo').textContent = '';
+        }
+
+        // กรองข้อมูล Table
+        function applyTableFilter() {
+            const startMonth = document.getElementById('tableStartMonth').value;
+            const endMonth = document.getElementById('tableEndMonth').value;
+            
+            filteredPatients = filterPatientsByDateRange(startMonth, endMonth);
+            renderTable();
+            
+            // แสดงข้อความ
+            const infoDiv = document.getElementById('tableFilterInfo');
+            if (startMonth || endMonth) {
+                const startText = startMonth ? new Date(startMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'เริ่มต้น';
+                const endText = endMonth ? new Date(endMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'ปัจจุบัน';
+                infoDiv.textContent = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText} (${filteredPatients.length} รายการ)`;
+            } else {
+                infoDiv.textContent = '';
+            }
+        }
+
+        function clearTableFilter() {
+            document.getElementById('tableStartMonth').value = '';
+            document.getElementById('tableEndMonth').value = '';
+            filteredPatients = patients;
+            renderTable();
+            document.getElementById('tableFilterInfo').textContent = '';
         }
 
         document.getElementById('patientForm').addEventListener('submit', async function(e) {
@@ -1124,8 +1395,8 @@
 
         function renderTable() {
             const container = document.getElementById('tableContainer');
-            if (patients.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">ยังไม่มีข้อมูลผู้ป่วย</p>';
+            if (filteredPatients.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">ไม่พบข้อมูลในช่วงเวลาที่เลือก</p>';
                 return;
             }
 
@@ -1149,7 +1420,7 @@
                     <tbody>
             `;
 
-            patients.forEach(patient => {
+            filteredPatients.forEach(patient => {
                 const bmi = patient.weight && patient.height ? 
                     (patient.weight / Math.pow(patient.height / 100, 2)).toFixed(2) : '-';
                 const fullName = `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
@@ -1158,49 +1429,28 @@
                 // กำหนดสถานะติดตามตาม NAF Score
                 const nafScore = parseFloat(patient.nafScore);
                 let statusBadge = '';
-                let statusText = '';
+                let followUpBadge = '';
                 
                 if (nafScore >= 11) {
                     statusBadge = `
-                        <span style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); 
+                        <span class="status-badge" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); 
                                      color: white; 
-                                     padding: 6px 12px; 
-                                     border-radius: 20px; 
-                                     font-weight: bold; 
-                                     font-size: 13px;
-                                     display: inline-flex;
-                                     align-items: center;
-                                     gap: 5px;
                                      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
                             🔴 Severe (≥11)
                         </span>
                     `;
                 } else if (nafScore >= 6) {
                     statusBadge = `
-                        <span style="background: linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%); 
+                        <span class="status-badge" style="background: linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%); 
                                      color: #333; 
-                                     padding: 6px 12px; 
-                                     border-radius: 20px; 
-                                     font-weight: bold; 
-                                     font-size: 13px;
-                                     display: inline-flex;
-                                     align-items: center;
-                                     gap: 5px;
                                      box-shadow: 0 2px 8px rgba(255, 217, 61, 0.3);">
                             🟡 Moderate (6-10)
                         </span>
                     `;
                 } else if (nafScore >= 0) {
                     statusBadge = `
-                        <span style="background: linear-gradient(135deg, #a8e6cf 0%, #81c784 100%); 
+                        <span class="status-badge" style="background: linear-gradient(135deg, #a8e6cf 0%, #81c784 100%); 
                                      color: #fff; 
-                                     padding: 6px 12px; 
-                                     border-radius: 20px; 
-                                     font-weight: bold; 
-                                     font-size: 13px;
-                                     display: inline-flex;
-                                     align-items: center;
-                                     gap: 5px;
                                      box-shadow: 0 2px 8px rgba(168, 230, 207, 0.3);">
                             🟢 ต่ำ (<6)
                         </span>
@@ -1217,11 +1467,13 @@
                     `;
                 }
                 
-                // เพิ่มข้อมูล Follow up ถ้ามี
+                // เพิ่มเครื่องหมายถูกถ้ามีการติดตามแล้ว
                 if (patient.followUpResult && patient.followUpResult !== '') {
-                    statusText = `<div style="margin-top: 5px; font-size: 12px; color: #666;">
-                        📋 ${patient.followUpResult}
-                    </div>`;
+                    followUpBadge = `
+                        <div class="status-followed">
+                            ✓ ติดตามแล้ว: ${patient.followUpResult}
+                        </div>
+                    `;
                 }
                 
                 html += `
@@ -1236,7 +1488,7 @@
                         <td>${patient.albumin || '-'}</td>
                         <td style="text-align: center;">
                             ${statusBadge}
-                            ${statusText}
+                            ${followUpBadge}
                         </td>
                         <td style="white-space: nowrap;">
                             <button class="btn btn-warning" onclick="editPatient(${patient.rowNumber})" style="padding: 5px 10px; margin: 2px;">✏️</button>
@@ -1251,16 +1503,16 @@
         }
 
         function updateDashboard() {
-            const total = patients.length;
+            const total = filteredPatients.length;
             
             // นับจำนวนที่ต้องติดตาม: NAF >= 6
-            const needFollowUp = patients.filter(p => {
+            const needFollowUp = filteredPatients.filter(p => {
                 const nafScore = parseFloat(p.nafScore);
                 return nafScore >= 6;
             }).length;
             
             // นับจำนวนที่ติดตามแล้ว (มีการบันทึก follow up)
-            const followedUp = patients.filter(p => 
+            const followedUp = filteredPatients.filter(p => 
                 p.followUpDate && p.followUpResult && p.followUpResult !== ''
             ).length;
 
@@ -1275,7 +1527,7 @@
 
         function renderTop5Diagnosis() {
             const diagnosisCounts = {};
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 if (p.diagnosis) {
                     diagnosisCounts[p.diagnosis] = (diagnosisCounts[p.diagnosis] || 0) + 1;
                 }
@@ -1306,7 +1558,7 @@
 
         function renderTop5Chronic() {
             const chronicCounts = {};
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 if (p.chronicDiseases) {
                     const diseases = p.chronicDiseases.split(',').map(d => d.trim()).filter(d => d);
                     diseases.forEach(disease => {
@@ -1343,7 +1595,7 @@
             
             // แบ่งกลุ่ม NAF ตามเกณฑ์ใหม่
             const nafGroups = { 'ต่ำ (<6)': 0, 'Moderate (6-10)': 0, 'Severe (≥11)': 0 };
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 const score = parseFloat(p.nafScore);
                 if (score >= 11) nafGroups['Severe (≥11)']++;
                 else if (score >= 6) nafGroups['Moderate (6-10)']++;
@@ -1351,14 +1603,14 @@
             });
 
             const wardGroups = {};
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 if (p.ward) {
                     wardGroups[p.ward] = (wardGroups[p.ward] || 0) + 1;
                 }
             });
 
             const bmiGroups = { 'ผอม': 0, 'ปกติ': 0, 'น้ำหนักเกิน': 0, 'โรคอ้วน': 0 };
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 if (p.weight && p.height) {
                     const bmi = p.weight / Math.pow(p.height / 100, 2);
                     if (bmi < 18.5) bmiGroups['ผอม']++;
@@ -1369,7 +1621,7 @@
             });
 
             const albuminGroups = { 'ปกติ (≥3.5)': 0, 'ต่ำเล็กน้อย (3.0-3.4)': 0, 'ต่ำ (<3.0)': 0, 'ไม่มีข้อมูล': 0 };
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 const alb = parseFloat(p.albumin);
                 if (!alb) albuminGroups['ไม่มีข้อมูล']++;
                 else if (alb >= 3.5) albuminGroups['ปกติ (≥3.5)']++;
@@ -1378,7 +1630,7 @@
             });
 
             const proteinGroups = { 'ปกติ (6.0-8.3)': 0, 'ต่ำ (<6.0)': 0, 'สูง (>8.3)': 0, 'ไม่มีข้อมูล': 0 };
-            patients.forEach(p => {
+            filteredPatients.forEach(p => {
                 const tp = parseFloat(p.totalProtein);
                 if (!tp) proteinGroups['ไม่มีข้อมูล']++;
                 else if (tp >= 6.0 && tp <= 8.3) proteinGroups['ปกติ (6.0-8.3)']++;
