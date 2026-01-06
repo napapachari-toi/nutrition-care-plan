@@ -1153,8 +1153,76 @@
                 const bmi = patient.weight && patient.height ? 
                     (patient.weight / Math.pow(patient.height / 100, 2)).toFixed(2) : '-';
                 const fullName = `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
-                const followUpStatus = patient.followUpResult || 'ยังไม่ติดตาม';
                 const recordDate = patient.recordDate ? new Date(patient.recordDate).toLocaleDateString('th-TH') : '-';
+                
+                // กำหนดสถานะติดตามตาม NAF Score
+                const nafScore = parseFloat(patient.nafScore);
+                let statusBadge = '';
+                let statusText = '';
+                
+                if (nafScore >= 11) {
+                    statusBadge = `
+                        <span style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); 
+                                     color: white; 
+                                     padding: 6px 12px; 
+                                     border-radius: 20px; 
+                                     font-weight: bold; 
+                                     font-size: 13px;
+                                     display: inline-flex;
+                                     align-items: center;
+                                     gap: 5px;
+                                     box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);">
+                            🔴 Severe (≥11)
+                        </span>
+                    `;
+                } else if (nafScore >= 6) {
+                    statusBadge = `
+                        <span style="background: linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%); 
+                                     color: #333; 
+                                     padding: 6px 12px; 
+                                     border-radius: 20px; 
+                                     font-weight: bold; 
+                                     font-size: 13px;
+                                     display: inline-flex;
+                                     align-items: center;
+                                     gap: 5px;
+                                     box-shadow: 0 2px 8px rgba(255, 217, 61, 0.3);">
+                            🟡 Moderate (6-10)
+                        </span>
+                    `;
+                } else if (nafScore >= 0) {
+                    statusBadge = `
+                        <span style="background: linear-gradient(135deg, #a8e6cf 0%, #81c784 100%); 
+                                     color: #fff; 
+                                     padding: 6px 12px; 
+                                     border-radius: 20px; 
+                                     font-weight: bold; 
+                                     font-size: 13px;
+                                     display: inline-flex;
+                                     align-items: center;
+                                     gap: 5px;
+                                     box-shadow: 0 2px 8px rgba(168, 230, 207, 0.3);">
+                            🟢 ต่ำ (<6)
+                        </span>
+                    `;
+                } else {
+                    statusBadge = `
+                        <span style="background: #e0e0e0; 
+                                     color: #666; 
+                                     padding: 6px 12px; 
+                                     border-radius: 20px; 
+                                     font-size: 13px;">
+                            ไม่มีข้อมูล
+                        </span>
+                    `;
+                }
+                
+                // เพิ่มข้อมูล Follow up ถ้ามี
+                if (patient.followUpResult && patient.followUpResult !== '') {
+                    statusText = `<div style="margin-top: 5px; font-size: 12px; color: #666;">
+                        📋 ${patient.followUpResult}
+                    </div>`;
+                }
                 
                 html += `
                     <tr>
@@ -1163,10 +1231,13 @@
                         <td>${fullName}</td>
                         <td>${patient.ward || '-'}</td>
                         <td>${patient.diagnosis || '-'}</td>
-                        <td>${patient.nafScore || '-'}</td>
+                        <td style="text-align: center; font-weight: bold;">${patient.nafScore || '-'}</td>
                         <td>${bmi}</td>
                         <td>${patient.albumin || '-'}</td>
-                        <td>${followUpStatus}</td>
+                        <td style="text-align: center;">
+                            ${statusBadge}
+                            ${statusText}
+                        </td>
                         <td style="white-space: nowrap;">
                             <button class="btn btn-warning" onclick="editPatient(${patient.rowNumber})" style="padding: 5px 10px; margin: 2px;">✏️</button>
                             <button class="btn btn-danger" onclick="deletePatient(${patient.rowNumber})" style="padding: 5px 10px; margin: 2px;">🗑️</button>
