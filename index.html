@@ -990,6 +990,19 @@
             <div id="table" class="page">
                 <h2 style="margin-bottom: 20px;">📋 ตารางข้อมูลผู้ป่วยทั้งหมด</h2>
                 
+                <!-- ส่วนค้นหา -->
+                <div class="filter-section" style="margin-bottom: 15px;">
+                    <div class="filter-row">
+                        <div class="filter-group" style="flex: 1; max-width: 400px;">
+                            <label>🔍 ค้นหา:</label>
+                            <input type="text" id="searchInput" placeholder="ค้นหา HN หรือ ชื่อ-นามสกุล" 
+                                   style="width: 100%;" oninput="applySearch()">
+                        </div>
+                        <button class="btn btn-secondary" onclick="clearSearch()">🔄 ล้างการค้นหา</button>
+                    </div>
+                    <div id="searchInfo" style="margin-top: 10px; color: #667eea; font-weight: bold;"></div>
+                </div>
+                
                 <!-- ส่วนกรองข้อมูล -->
                 <div class="filter-section">
                     <div class="filter-row">
@@ -1070,6 +1083,7 @@
         
         let patients = [];
         let filteredPatients = []; // สำหรับเก็บข้อมูลที่กรองแล้ว
+        let searchFilteredPatients = []; // สำหรับเก็บข้อมูลที่ค้นหาแล้ว
         let deleteRowNumber = null;
 
         window.onload = function() {
@@ -1252,6 +1266,7 @@
                 if (data.status === 'success') {
                     patients = data.data;
                     filteredPatients = patients; // เริ่มต้นด้วยข้อมูลทั้งหมด
+                    searchFilteredPatients = patients; // เริ่มต้นด้วยข้อมูลทั้งหมด
                     renderTable();
                     updateDashboard();
                     showAlert('โหลดข้อมูลสำเร็จ! ✅', 'success');
@@ -1264,6 +1279,40 @@
             } finally {
                 showLoading(false);
             }
+        }
+
+        // ฟังก์ชันค้นหา
+        function applySearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                searchFilteredPatients = filteredPatients;
+                document.getElementById('searchInfo').textContent = '';
+            } else {
+                searchFilteredPatients = filteredPatients.filter(p => {
+                    const hn = (p.hn || '').toLowerCase();
+                    const firstName = (p.firstName || '').toLowerCase();
+                    const lastName = (p.lastName || '').toLowerCase();
+                    const fullName = `${firstName} ${lastName}`;
+                    
+                    return hn.includes(searchTerm) || 
+                           firstName.includes(searchTerm) || 
+                           lastName.includes(searchTerm) ||
+                           fullName.includes(searchTerm);
+                });
+                
+                document.getElementById('searchInfo').textContent = 
+                    `🔍 พบ ${searchFilteredPatients.length} รายการจากการค้นหา "${document.getElementById('searchInput').value}"`;
+            }
+            
+            renderTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchFilteredPatients = filteredPatients;
+            document.getElementById('searchInfo').textContent = '';
+            renderTable();
         }
 
         // ฟังก์ชันกรองข้อมูลตามช่วงเวลา
@@ -1377,6 +1426,25 @@
             const endYear = document.getElementById('tableEndYear').value;
             
             filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
+            
+            // นำ filter ไปใช้กับการค้นหาด้วย
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchTerm) {
+                searchFilteredPatients = filteredPatients.filter(p => {
+                    const hn = (p.hn || '').toLowerCase();
+                    const firstName = (p.firstName || '').toLowerCase();
+                    const lastName = (p.lastName || '').toLowerCase();
+                    const fullName = `${firstName} ${lastName}`;
+                    
+                    return hn.includes(searchTerm) || 
+                           firstName.includes(searchTerm) || 
+                           lastName.includes(searchTerm) ||
+                           fullName.includes(searchTerm);
+                });
+            } else {
+                searchFilteredPatients = filteredPatients;
+            }
+            
             renderTable();
             
             // แสดงข้อความ
@@ -1415,7 +1483,16 @@
             document.getElementById('tableEndMonth').value = '';
             document.getElementById('tableEndYear').value = '';
             filteredPatients = patients;
-            renderTable();
+            
+            // อัพเดทการค้นหาด้วย
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchTerm) {
+                applySearch();
+            } else {
+                searchFilteredPatients = patients;
+                renderTable();
+            }
+            
             document.getElementById('tableFilterInfo').textContent = '';
         }
 
@@ -1570,7 +1647,7 @@
 
         function renderTable() {
             const container = document.getElementById('tableContainer');
-            if (filteredPatients.length === 0) {
+            if (searchFilteredPatients.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">ไม่พบข้อมูลในช่วงเวลาที่เลือก</p>';
                 return;
             }
@@ -1595,7 +1672,7 @@
                     <tbody>
             `;
 
-            filteredPatients.forEach(patient => {
+            searchFilteredPatients.forEach(patient => {
                 const bmi = patient.weight && patient.height ? 
                     (patient.weight / Math.pow(patient.height / 100, 2)).toFixed(2) : '-';
                 const fullName = `${patient.firstName || ''} ${patient.lastName || ''}`.trim();
@@ -1642,11 +1719,11 @@
                     `;
                 }
                 
-                // เพิ่มเครื่องหมายถูกถ้ามีการติดตามแล้ว
+                // เพิ่มเครื่องหมายถูกถ้ามีการติดตามแล้ว (แสดงแค่ว่าติดตามแล้ว ไม่แสดงรายละเอียด)
                 if (patient.followUpResult && patient.followUpResult !== '') {
                     followUpBadge = `
                         <div class="status-followed">
-                            ✓ ติดตามแล้ว: ${patient.followUpResult}
+                            ✓ ติดตามแล้ว
                         </div>
                     `;
                 }
