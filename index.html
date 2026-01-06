@@ -906,11 +906,49 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label>🗓️ ตั้งแต่:</label>
-                            <input type="month" id="dashboardStartMonth" onchange="applyDashboardFilter()">
+                            <select id="dashboardStartMonth">
+                                <option value="">เดือน</option>
+                                <option value="01">มกราคม</option>
+                                <option value="02">กุมภาพันธ์</option>
+                                <option value="03">มีนาคม</option>
+                                <option value="04">เมษายน</option>
+                                <option value="05">พฤษภาคม</option>
+                                <option value="06">มิถุนายน</option>
+                                <option value="07">กรกฎาคม</option>
+                                <option value="08">สิงหาคม</option>
+                                <option value="09">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
                         </div>
                         <div class="filter-group">
-                            <label>ถึง:</label>
-                            <input type="month" id="dashboardEndMonth" onchange="applyDashboardFilter()">
+                            <select id="dashboardStartYear">
+                                <option value="">ปี</option>
+                            </select>
+                        </div>
+                        <span style="margin: 0 5px;">ถึง</span>
+                        <div class="filter-group">
+                            <select id="dashboardEndMonth">
+                                <option value="">เดือน</option>
+                                <option value="01">มกราคม</option>
+                                <option value="02">กุมภาพันธ์</option>
+                                <option value="03">มีนาคม</option>
+                                <option value="04">เมษายน</option>
+                                <option value="05">พฤษภาคม</option>
+                                <option value="06">มิถุนายน</option>
+                                <option value="07">กรกฎาคม</option>
+                                <option value="08">สิงหาคม</option>
+                                <option value="09">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="dashboardEndYear">
+                                <option value="">ปี</option>
+                            </select>
                         </div>
                         <button class="btn btn-primary" onclick="applyDashboardFilter()">🔍 กรองข้อมูล</button>
                         <button class="btn btn-secondary" onclick="clearDashboardFilter()">🔄 รีเซ็ต</button>
@@ -957,11 +995,49 @@
                     <div class="filter-row">
                         <div class="filter-group">
                             <label>🗓️ ตั้งแต่:</label>
-                            <input type="month" id="tableStartMonth" onchange="applyTableFilter()">
+                            <select id="tableStartMonth">
+                                <option value="">เดือน</option>
+                                <option value="01">มกราคม</option>
+                                <option value="02">กุมภาพันธ์</option>
+                                <option value="03">มีนาคม</option>
+                                <option value="04">เมษายน</option>
+                                <option value="05">พฤษภาคม</option>
+                                <option value="06">มิถุนายน</option>
+                                <option value="07">กรกฎาคม</option>
+                                <option value="08">สิงหาคม</option>
+                                <option value="09">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
                         </div>
                         <div class="filter-group">
-                            <label>ถึง:</label>
-                            <input type="month" id="tableEndMonth" onchange="applyTableFilter()">
+                            <select id="tableStartYear">
+                                <option value="">ปี</option>
+                            </select>
+                        </div>
+                        <span style="margin: 0 5px;">ถึง</span>
+                        <div class="filter-group">
+                            <select id="tableEndMonth">
+                                <option value="">เดือน</option>
+                                <option value="01">มกราคม</option>
+                                <option value="02">กุมภาพันธ์</option>
+                                <option value="03">มีนาคม</option>
+                                <option value="04">เมษายน</option>
+                                <option value="05">พฤษภาคม</option>
+                                <option value="06">มิถุนายน</option>
+                                <option value="07">กรกฎาคม</option>
+                                <option value="08">สิงหาคม</option>
+                                <option value="09">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="tableEndYear">
+                                <option value="">ปี</option>
+                            </select>
                         </div>
                         <button class="btn btn-primary" onclick="applyTableFilter()">🔍 กรองข้อมูล</button>
                         <button class="btn btn-secondary" onclick="clearTableFilter()">🔄 รีเซ็ต</button>
@@ -990,7 +1066,7 @@
 
     <script>
         // ⚠️ สำคัญ: แทนที่ URL ด้านล่างนี้ด้วย Web App URL ของคุณจาก Google Apps Script
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyT63XP7ugf7QovhgCLtfA3QWLeEr06ibZAlZKZQYtyDuCx1jjvP6xWIH0sQqR4xSps/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQHIqUx-gvsmYneQsyhT7s3X7A5hj4-Y_9dWQW204HK7L2fIEO9EHFFfO1k0uK-HM/exec';
         
         let patients = [];
         let filteredPatients = []; // สำหรับเก็บข้อมูลที่กรองแล้ว
@@ -998,8 +1074,32 @@
 
         window.onload = function() {
             setDefaultDate();
+            populateYearOptions();
             loadAllData();
         };
+
+        // สร้างตัวเลือกปี (ย้อนหลัง 5 ปี และอนาคต 2 ปี)
+        function populateYearOptions() {
+            const currentYear = new Date().getFullYear();
+            const yearSelects = [
+                'dashboardStartYear',
+                'dashboardEndYear',
+                'tableStartYear',
+                'tableEndYear'
+            ];
+
+            yearSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">ปี</option>';
+                
+                for (let year = currentYear - 5; year <= currentYear + 2; year++) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year + 543; // แปลงเป็น พ.ศ.
+                    select.appendChild(option);
+                }
+            });
+        }
 
         function showLoading(show = true) {
             const overlay = document.getElementById('loadingOverlay');
@@ -1167,8 +1267,9 @@
         }
 
         // ฟังก์ชันกรองข้อมูลตามช่วงเวลา
-        function filterPatientsByDateRange(startMonth, endMonth) {
-            if (!startMonth && !endMonth) {
+        function filterPatientsByDateRange(startMonth, startYear, endMonth, endYear) {
+            // ถ้าไม่มีการเลือกเลย ให้แสดงทั้งหมด
+            if (!startMonth && !startYear && !endMonth && !endYear) {
                 return patients;
             }
 
@@ -1176,14 +1277,42 @@
                 if (!p.recordDate) return false;
                 
                 const recordDate = new Date(p.recordDate);
-                const recordYearMonth = `${recordDate.getFullYear()}-${String(recordDate.getMonth() + 1).padStart(2, '0')}`;
+                const recordYear = recordDate.getFullYear();
+                const recordMonth = recordDate.getMonth() + 1; // 1-12
+
+                // สร้างค่าเปรียบเทียบแบบ YYYYMM
+                const recordYearMonth = recordYear * 100 + recordMonth;
                 
-                if (startMonth && endMonth) {
-                    return recordYearMonth >= startMonth && recordYearMonth <= endMonth;
+                let startYearMonth = null;
+                let endYearMonth = null;
+
+                // คำนวณช่วงเริ่มต้น
+                if (startYear && startMonth) {
+                    startYearMonth = parseInt(startYear) * 100 + parseInt(startMonth);
+                } else if (startYear) {
+                    startYearMonth = parseInt(startYear) * 100 + 1; // มกราคม
                 } else if (startMonth) {
-                    return recordYearMonth >= startMonth;
+                    // ถ้ามีแค่เดือนไม่มีปี ให้ใช้ปีแรกสุดของข้อมูล
+                    startYearMonth = 0;
+                }
+
+                // คำนวณช่วงสิ้นสุด
+                if (endYear && endMonth) {
+                    endYearMonth = parseInt(endYear) * 100 + parseInt(endMonth);
+                } else if (endYear) {
+                    endYearMonth = parseInt(endYear) * 100 + 12; // ธันวาคม
                 } else if (endMonth) {
-                    return recordYearMonth <= endMonth;
+                    // ถ้ามีแค่เดือนไม่มีปี ให้ใช้ปีปัจจุบัน
+                    endYearMonth = 999999;
+                }
+
+                // กรองตามช่วงที่กำหนด
+                if (startYearMonth !== null && endYearMonth !== null) {
+                    return recordYearMonth >= startYearMonth && recordYearMonth <= endYearMonth;
+                } else if (startYearMonth !== null) {
+                    return recordYearMonth >= startYearMonth;
+                } else if (endYearMonth !== null) {
+                    return recordYearMonth <= endYearMonth;
                 }
                 
                 return true;
@@ -1193,16 +1322,37 @@
         // กรองข้อมูล Dashboard
         function applyDashboardFilter() {
             const startMonth = document.getElementById('dashboardStartMonth').value;
+            const startYear = document.getElementById('dashboardStartYear').value;
             const endMonth = document.getElementById('dashboardEndMonth').value;
+            const endYear = document.getElementById('dashboardEndYear').value;
             
-            filteredPatients = filterPatientsByDateRange(startMonth, endMonth);
+            filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
             updateDashboard();
             
             // แสดงข้อความ
             const infoDiv = document.getElementById('dashboardFilterInfo');
-            if (startMonth || endMonth) {
-                const startText = startMonth ? new Date(startMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'เริ่มต้น';
-                const endText = endMonth ? new Date(endMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'ปัจจุบัน';
+            if (startMonth || startYear || endMonth || endYear) {
+                const monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+                                  'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+                
+                let startText = 'เริ่มต้น';
+                if (startMonth && startYear) {
+                    startText = `${monthNames[parseInt(startMonth)]} ${parseInt(startYear) + 543}`;
+                } else if (startMonth) {
+                    startText = monthNames[parseInt(startMonth)];
+                } else if (startYear) {
+                    startText = `ปี ${parseInt(startYear) + 543}`;
+                }
+                
+                let endText = 'ปัจจุบัน';
+                if (endMonth && endYear) {
+                    endText = `${monthNames[parseInt(endMonth)]} ${parseInt(endYear) + 543}`;
+                } else if (endMonth) {
+                    endText = monthNames[parseInt(endMonth)];
+                } else if (endYear) {
+                    endText = `ปี ${parseInt(endYear) + 543}`;
+                }
+                
                 infoDiv.textContent = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText} (${filteredPatients.length} รายการ)`;
             } else {
                 infoDiv.textContent = '';
@@ -1211,7 +1361,9 @@
 
         function clearDashboardFilter() {
             document.getElementById('dashboardStartMonth').value = '';
+            document.getElementById('dashboardStartYear').value = '';
             document.getElementById('dashboardEndMonth').value = '';
+            document.getElementById('dashboardEndYear').value = '';
             filteredPatients = patients;
             updateDashboard();
             document.getElementById('dashboardFilterInfo').textContent = '';
@@ -1220,16 +1372,37 @@
         // กรองข้อมูล Table
         function applyTableFilter() {
             const startMonth = document.getElementById('tableStartMonth').value;
+            const startYear = document.getElementById('tableStartYear').value;
             const endMonth = document.getElementById('tableEndMonth').value;
+            const endYear = document.getElementById('tableEndYear').value;
             
-            filteredPatients = filterPatientsByDateRange(startMonth, endMonth);
+            filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
             renderTable();
             
             // แสดงข้อความ
             const infoDiv = document.getElementById('tableFilterInfo');
-            if (startMonth || endMonth) {
-                const startText = startMonth ? new Date(startMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'เริ่มต้น';
-                const endText = endMonth ? new Date(endMonth + '-01').toLocaleDateString('th-TH', { year: 'numeric', month: 'long' }) : 'ปัจจุบัน';
+            if (startMonth || startYear || endMonth || endYear) {
+                const monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+                                  'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+                
+                let startText = 'เริ่มต้น';
+                if (startMonth && startYear) {
+                    startText = `${monthNames[parseInt(startMonth)]} ${parseInt(startYear) + 543}`;
+                } else if (startMonth) {
+                    startText = monthNames[parseInt(startMonth)];
+                } else if (startYear) {
+                    startText = `ปี ${parseInt(startYear) + 543}`;
+                }
+                
+                let endText = 'ปัจจุบัน';
+                if (endMonth && endYear) {
+                    endText = `${monthNames[parseInt(endMonth)]} ${parseInt(endYear) + 543}`;
+                } else if (endMonth) {
+                    endText = monthNames[parseInt(endMonth)];
+                } else if (endYear) {
+                    endText = `ปี ${parseInt(endYear) + 543}`;
+                }
+                
                 infoDiv.textContent = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText} (${filteredPatients.length} รายการ)`;
             } else {
                 infoDiv.textContent = '';
@@ -1238,7 +1411,9 @@
 
         function clearTableFilter() {
             document.getElementById('tableStartMonth').value = '';
+            document.getElementById('tableStartYear').value = '';
             document.getElementById('tableEndMonth').value = '';
+            document.getElementById('tableEndYear').value = '';
             filteredPatients = patients;
             renderTable();
             document.getElementById('tableFilterInfo').textContent = '';
