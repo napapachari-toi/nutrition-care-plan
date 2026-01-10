@@ -2552,8 +2552,7 @@ function drawComparisonLineChart(canvasId, periods, labels, data) {
     // ตอนนี้ยังไม่ได้ implement ครับ เพราะต้องใช้โค้ดยาวมาก
     // ถ้าต้องการให้ทำงาน ผมจะสร้างให้ในขั้นตอนถัดไป
     showAlert('ฟีเจอร์เปรียบเทียบกำลังพัฒนา', 'info');
-}
-        function showAlert(message, type) {
+}function showAlert(message, type) {
             const container = document.getElementById('alertContainer');
             const alertClass = type === 'success' ? 'alert-success' : 
                                type === 'warning' ? 'alert-warning' : 
