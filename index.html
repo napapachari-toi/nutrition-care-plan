@@ -225,13 +225,19 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 25px;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
         }
 
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
         .stat-number {
             font-size: 3em;
             font-weight: bold;
@@ -427,10 +433,10 @@
             user-select: none;
             position: relative;
             transition: all 0.3s;
-            font-size: 14px;
+            font-size: 13px;
             white-space: nowrap;
             text-align: center;
-            min-width: 100px;
+            padding: 12px 8px;
         }
 
         th:hover {
@@ -733,7 +739,47 @@
             100% { transform: rotate(360deg); }
         }
 
+        .chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto;
+        }
+.chart-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            max-width: 350px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
             .filter-row {
                 flex-direction: column;
                 align-items: stretch;
@@ -761,61 +807,54 @@
             }
 
             table {
-                font-size: 11px;
+                font-size: 10px;
             }
 
             th, td {
-                padding: 8px 6px;
-                font-size: 11px;
+                padding: 8px 4px;
+                font-size: 10px;
             }
 
             th {
-                font-size: 11px;
-                min-width: 60px;
-            }
-
-            th br {
-                display: inline;
-            }
-
-            th br::after {
-                content: " ";
+                font-size: 10px;
+                min-width: 50px;
             }
 
             .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .pagination-btn {
                 padding: 6px 12px;
                 font-size: 12px;
             }
-        }
 
-        .chart-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        canvas {
-            max-width: 350px;
-            height: auto;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 768px) {
-            .filter-row {
-                flex-direction: column;
-                align-items: stretch;
+            .stat-card {
+                padding: 20px;
             }
-            
-            .filter-group {
-                width: 100%;
-            }
-            
-            .filter-group select,
-            .filter-group input {
-                width: 100%;
+
+            .stat-number {
+                font-size: 2.5em;
             }
         }
-    </style>
+
+        /* Tablet Responsive */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 6px;
+            }
+        }
+  </style>
 </head>
 <body>
     <div class="loading-overlay" id="loadingOverlay">
@@ -832,11 +871,11 @@
         </header>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showPage('home')">🏠 หน้าแรก</button>
-            <button class="nav-tab" onclick="showPage('form')">📝 บันทึกข้อมูล</button>
-            <button class="nav-tab" onclick="showPage('dashboard')">📊 Dashboard</button>
-            <button class="nav-tab" onclick="showPage('table')">📋 ตารางข้อมูล</button>
-        </div>
+    <button class="nav-tab active" onclick="showPage('home', this)">🏠 หน้าแรก</button>
+    <button class="nav-tab" onclick="showPage('form', this)">📝 บันทึกข้อมูล</button>
+    <button class="nav-tab" onclick="showPage('dashboard', this)">📊 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('table', this)">📋 ตารางข้อมูล</button>
+</div>
 
         <div class="content">
             <!-- หน้าแรก -->
@@ -844,7 +883,7 @@
                 <div class="welcome-section">
                     <h2>ยินดีต้อนรับสู่ระบบ Nutrition Care Plan</h2>
                     <p style="color: #666; margin-bottom: 30px;">ระบบบันทึกและติดตามภาวะโภชนาการผู้ป่วยอย่างมีประสิทธิภาพ</p>
-                    <button class="btn btn-primary" onclick="showPage('form')">➕ เพิ่มผู้ป่วยใหม่</button>
+                    <button class="btn btn-primary" onclick="document.querySelectorAll('.nav-tab')[1].click()">➕ เพิ่มผู้ป่วยใหม่</button>
                     <button class="btn btn-success" onclick="loadAllData()">🔄 รีเฟรชข้อมูล</button>
                 </div>
             </div>
@@ -907,6 +946,17 @@
                                 <option value="Meningitis">Meningitis (เยื่อหุ้มสมองอักเสบ)</option>
                                 <option value="Encephalitis">Encephalitis (สมองอักเสบ)</option>
                                 <option value="Migraine">Migraine (ไมเกรน)</option>
+                                <option value="Meningioma">Meningioma (เนื้องอกเยื่อหุ้มสมอง)</option>
+                                <option value="Spinal stenosis">Spinal stenosis (ไขสันหลังตีบ)</option>
+                                <option value="Spine tumors">Spine tumors (เนื้องอกกระดูกสันหลัง)</option>
+                                <option value="Spondylolisthesis">Spondylolisthesis (กระดูกสันหลังเคลื่อน)</option>
+                                <option value="Cerebral aneurysm">Cerebral aneurysm (หลอดเลือดสมองโป่งพอง)</option>
+                                <option value="Basal Ganglia Hemorrhage">Basal Ganglia Hemorrhage (เลือดออกในสมองส่วน Basal Ganglia)</option>
+                                <option value="Intracerebral Hemorrhage">Intracerebral Hemorrhage (เลือดออกในสมอง)</option>
+                                <option value="Intraventricular Hemorrhage">Intraventricular Hemorrhage (เลือดออกในช่องสมอง)</option>
+                                <option value="Subarachnoid Hemorrhage">Subarachnoid Hemorrhage (เลือดออกใต้เยื่อหุ้มสมอง)</option>
+                                <option value="Subdural Hematoma">Subdural Hematoma (เลือดคั่งใต้เยื่อหุ้มสมอง)</option>
+                                <option value="Failed Back Surgery">Failed Back Surgery (ผ่าตัดหลังล้มเหลว)</option>
                                 <option value="อื่นๆ">อื่นๆ</option>
                             </select>
                         </div>
@@ -1036,13 +1086,24 @@
                 </form>
             </div>
 
-            <!-- Dashboard -->
+<!-- Dashboard -->
             <div id="dashboard" class="page">
                 <h2 style="margin-bottom: 20px;">📊 Dashboard - ภาพรวมข้อมูลผู้ป่วย</h2>
                 
                 <!-- ส่วนกรองข้อมูล -->
                 <div class="filter-section">
                     <div class="filter-row">
+                        <div class="filter-group">
+                            <label>🏥 หอผู้ป่วย:</label>
+                           <select id="dashboardWardFilter" onchange="applyDashboardFilter()">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="MED">MED</option>
+                                <option value="SURG">SURG</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
                         <div class="filter-group">
                             <label>🗓️ ตั้งแต่:</label>
                             <select id="dashboardStartMonth">
@@ -1096,15 +1157,15 @@
                 </div>
                 
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                         <div class="stat-number" id="totalPatients">-</div>
                         <div class="stat-label">ผู้ป่วยทั้งหมด</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
                         <div class="stat-number" id="needFollowUp">-</div>
                         <div class="stat-label">ต้องติดตาม</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
                         <div class="stat-number" id="followedUp">-</div>
                         <div class="stat-label">ติดตามแล้ว</div>
                     </div>
@@ -1146,8 +1207,9 @@
 
                 <div id="chartsContainer"></div>
             </div>
+            <!-- ปิด Dashboard ที่นี่ -->
 
-            <!-- ตารางข้อมูล -->
+<!-- ตารางข้อมูล -->
             <div id="table" class="page">
                 <h2 style="margin-bottom: 20px;">📋 ตารางข้อมูลผู้ป่วยทั้งหมด</h2>
                 
@@ -1167,6 +1229,17 @@
                 <!-- ส่วนกรองข้อมูล -->
                 <div class="filter-section">
                     <div class="filter-row">
+                        <div class="filter-group">
+                            <label>🏥 หอผู้ป่วย:</label>
+                           <select id="tableWardFilter" onchange="applyTableFilter()">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="MED">MED</option>
+                                <option value="SURG">SURG</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
                         <div class="filter-group">
                             <label>🗓️ ตั้งแต่:</label>
                             <select id="tableStartMonth">
@@ -1239,8 +1312,11 @@
                     </div>
                 </div>
             </div>
+            <!-- ปิด Table ที่นี่ -->
         </div>
+        <!-- ปิด content ที่นี่ -->
     </div>
+    <!-- ปิด container ที่นี่ -->
 
     <!-- Modal สำหรับแก้ไข/ลบ -->
     <div id="deleteModal" class="modal">
@@ -1274,6 +1350,8 @@
         // Sort variables
         let sortColumn = null;
         let sortDirection = 'asc'; // asc or desc
+               // Ward filter variable
+        let selectedWard = 'all'; // all, MED, SURG, 5, 6, 8
 
         window.onload = function() {
             setDefaultDate();
@@ -1318,19 +1396,31 @@
             document.getElementById('recordDate').value = today;
         }
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            event.target.classList.add('active');
-
-            if (pageId === 'dashboard') {
-                updateDashboard();
-            } else if (pageId === 'table') {
-                renderTable();
+        function showPage(pageId, clickedButton) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    
+    document.getElementById(pageId).classList.add('active');
+    
+    // หา tab ที่ถูกคลิกและเพิ่ม active class
+    if (!clickedButton) {
+        // ถ้าไม่มี button ส่งมา ให้หาจากข้อความ
+        const tabs = document.querySelectorAll('.nav-tab');
+        tabs.forEach(tab => {
+            if (tab.onclick.toString().includes(`'${pageId}'`)) {
+                tab.classList.add('active');
             }
-        }
+        });
+    } else {
+        clickedButton.classList.add('active');
+    }
+
+    if (pageId === 'dashboard') {
+        updateDashboard();
+    } else if (pageId === 'table') {
+        renderTable();
+    }
+}
 
         function toggleOtherDiagnosis() {
             const diagnosis = document.getElementById('diagnosis').value;
@@ -1568,38 +1658,58 @@ function applySearch() {
 
         // กรองข้อมูล Dashboard
         function applyDashboardFilter() {
-                    const startMonth = document.getElementById('dashboardStartMonth').value;
-                    const startYear = document.getElementById('dashboardStartYear').value;
-                    const endMonth = document.getElementById('dashboardEndMonth').value;
-                    const endYear = document.getElementById('dashboardEndYear').value;
+    const startMonth = document.getElementById('dashboardStartMonth').value;
+    const startYear = document.getElementById('dashboardStartYear').value;
+    const endMonth = document.getElementById('dashboardEndMonth').value;
+    const endYear = document.getElementById('dashboardEndYear').value;
+
+    // อ่านค่าหอผู้ป่วยจาก dropdown
+    selectedWard = document.getElementById('dashboardWardFilter').value;
+
+    // กรองตามช่วงเวลา
+    filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
     
-                    filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
-    
-                    // แสดงข้อความ
-                    const infoDiv = document.getElementById('dashboardFilterInfo');
-            if (startMonth || startYear || endMonth || endYear) {
-                const monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
-                                  'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-                
-                let startText = 'เริ่มต้น';
-                if (startMonth && startYear) {
-                    startText = `${monthNames[parseInt(startMonth)]} ${parseInt(startYear) + 543}`;
-                } else if (startMonth) {
-                    startText = monthNames[parseInt(startMonth)];
-                } else if (startYear) {
-                    startText = `ปี ${parseInt(startYear) + 543}`;
-                }
-                
-                let endText = 'ปัจจุบัน';
-                if (endMonth && endYear) {
-                    endText = `${monthNames[parseInt(endMonth)]} ${parseInt(endYear) + 543}`;
-                } else if (endMonth) {
-                    endText = monthNames[parseInt(endMonth)];
-                } else if (endYear) {
-                    endText = `ปี ${parseInt(endYear) + 543}`;
-                }
-                
-                infoDiv.textContent = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText} (${filteredPatients.length} รายการ)`;
+    // กรองตามหอผู้ป่วย (แปลงเป็น string และ trim ช่องว่าง)
+    if (selectedWard !== 'all') {
+        filteredPatients = filteredPatients.filter(p => {
+            const ward = String(p.ward || '').trim();
+            return ward === selectedWard;
+        });
+    }
+
+    // แสดงข้อความ
+    const infoDiv = document.getElementById('dashboardFilterInfo');
+    if (startMonth || startYear || endMonth || endYear) {
+        const monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+                          'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        
+        let startText = 'เริ่มต้น';
+        if (startMonth && startYear) {
+            startText = `${monthNames[parseInt(startMonth)]} ${parseInt(startYear) + 543}`;
+        } else if (startMonth) {
+            startText = monthNames[parseInt(startMonth)];
+        } else if (startYear) {
+            startText = `ปี ${parseInt(startYear) + 543}`;
+        }
+        
+        let endText = 'ปัจจุบัน';
+        if (endMonth && endYear) {
+            endText = `${monthNames[parseInt(endMonth)]} ${parseInt(endYear) + 543}`;
+        } else if (endMonth) {
+            endText = monthNames[parseInt(endMonth)];
+        } else if (endYear) {
+            endText = `ปี ${parseInt(endYear) + 543}`;
+        }
+        
+        let filterText = `📊 กำลังแสดงข้อมูล: ${startText} ถึง ${endText}`;
+        if (selectedWard !== 'all') {
+            filterText += ` | หอ ${selectedWard}`;
+        }
+        filterText += ` (${filteredPatients.length} รายการ)`;
+        
+        infoDiv.textContent = filterText;
+    } else if (selectedWard !== 'all') {
+        infoDiv.textContent = `📊 กำลังแสดงข้อมูล: หอ ${selectedWard} (${filteredPatients.length} รายการ)`;
     } else {
         infoDiv.textContent = '';
     }
@@ -1608,15 +1718,17 @@ function applySearch() {
 }
 
         function clearDashboardFilter() {
+            document.getElementById('dashboardWardFilter').value = 'all';
             document.getElementById('dashboardStartMonth').value = '';
             document.getElementById('dashboardStartYear').value = '';
             document.getElementById('dashboardEndMonth').value = '';
             document.getElementById('dashboardEndYear').value = '';
+            selectedWard = 'all';
             filteredPatients = patients;
             updateDashboard();
             document.getElementById('dashboardFilterInfo').textContent = '';
         }
-
+                
         // กรองข้อมูล Table
         function applyTableFilter() {
     const startMonth = document.getElementById('tableStartMonth').value;
@@ -1624,7 +1736,19 @@ function applySearch() {
     const endMonth = document.getElementById('tableEndMonth').value;
     const endYear = document.getElementById('tableEndYear').value;
     
+    // อ่านค่าหอผู้ป่วย
+    selectedWard = document.getElementById('tableWardFilter').value;
+    
+    // กรองตามช่วงเวลา
     filteredPatients = filterPatientsByDateRange(startMonth, startYear, endMonth, endYear);
+    
+    // กรองตามหอผู้ป่วย (แปลงเป็น string และ trim ช่องว่าง)
+    if (selectedWard !== 'all') {
+        filteredPatients = filteredPatients.filter(p => {
+            const ward = String(p.ward || '').trim();
+            return ward === selectedWard;
+        });
+    }
     
     // นำ filter ไปใช้กับการค้นหาด้วย
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1675,12 +1799,14 @@ function applySearch() {
     
     renderTable();
 }
-
+                
         function clearTableFilter() {
+            document.getElementById('tableWardFilter').value = 'all';
             document.getElementById('tableStartMonth').value = '';
             document.getElementById('tableStartYear').value = '';
             document.getElementById('tableEndMonth').value = '';
             document.getElementById('tableEndYear').value = '';
+            selectedWard = 'all';
             filteredPatients = patients;
             
             // อัพเดทการค้นหาด้วย
@@ -1736,7 +1862,7 @@ function applySearch() {
                     showAlert(isEdit ? 'แก้ไขข้อมูลสำเร็จ! ✅' : 'บันทึกข้อมูลสำเร็จ! ✅', 'success');
                     resetForm();
                     await loadAllData();
-                    setTimeout(() => showPage('table'), 1500);
+                    setTimeout(() => document.querySelectorAll('.nav-tab')[3].click(), 1500);
                 } else {
                     showAlert('เกิดข้อผิดพลาด: ' + (result.message || 'ไม่สามารถบันทึกข้อมูลได้'), 'danger');
                 }
@@ -1769,8 +1895,14 @@ function applySearch() {
             document.getElementById('lastName').value = patient.lastName || '';
             document.getElementById('ward').value = patient.ward || '';
             
-            const standardDiagnoses = ['Stroke', "Parkinson's Disease", "Alzheimer's Disease", 'Epilepsy', 
-                                       'Multiple Sclerosis', 'Brain Tumor', 'Meningitis', 'Encephalitis', 'Migraine'];
+            const standardDiagnoses = [
+                'Stroke', "Parkinson's Disease", "Alzheimer's Disease", 'Epilepsy', 
+                'Multiple Sclerosis', 'Brain Tumor', 'Meningitis', 'Encephalitis', 'Migraine',
+                'Meningioma', 'Spinal stenosis', 'Spine tumors', 'Spondylolisthesis',
+                'Cerebral aneurysm', 'Basal Ganglia Hemorrhage', 'Intracerebral Hemorrhage',
+                'Intraventricular Hemorrhage', 'Subarachnoid Hemorrhage', 'Subdural Hematoma',
+                'Failed Back Surgery'
+            ];
             
             if (standardDiagnoses.includes(patient.diagnosis)) {
                 document.getElementById('diagnosis').value = patient.diagnosis;
@@ -1795,7 +1927,7 @@ function applySearch() {
             document.getElementById('submitBtn').textContent = '💾 บันทึกการแก้ไข';
             document.getElementById('cancelBtn').style.display = 'inline-block';
             
-            showPage('form');
+            document.querySelectorAll('.nav-tab')[1].click(); // ไปหน้า form
         }
 
         function deletePatient(rowNumber) {
@@ -1909,15 +2041,15 @@ function applySearch() {
                 <table>
                     <thead>
                         <tr>
-                            <th class="sortable" onclick="sortTable('recordDate')" style="min-width: 110px;">วันที่<br>บันทึก</th>
+                            <th class="sortable" onclick="sortTable('recordDate')" style="min-width: 120px;">วันที่บันทึก</th>
                             <th class="sortable" onclick="sortTable('hn')" style="min-width: 90px;">HN</th>
                             <th class="sortable" onclick="sortTable('firstName')" style="min-width: 150px;">ชื่อ-นามสกุล</th>
-                            <th class="sortable" onclick="sortTable('ward')" style="min-width: 90px;">หอ<br>ผู้ป่วย</th>
+                            <th class="sortable" onclick="sortTable('ward')" style="min-width: 100px;">หอผู้ป่วย</th>
                             <th class="sortable" onclick="sortTable('diagnosis')" style="min-width: 150px;">โรคหลัก</th>
                             <th class="sortable" onclick="sortTable('nafScore')" style="min-width: 70px;">NAF</th>
                             <th style="min-width: 70px;">BMI</th>
                             <th style="min-width: 80px;">Albumin</th>
-                            <th style="min-width: 140px;">สถานะ<br>ติดตาม</th>
+                            <th style="min-width: 120px;">สถานะติดตาม</th>
                             <th style="min-width: 110px;">จัดการ</th>
                         </tr>
                     </thead>
@@ -2139,10 +2271,10 @@ function sortTable(column) {
             const total = filteredPatients.length;
             
             // นับจำนวนที่ต้องติดตาม: NAF >= 6
-            const needFollowUp = filteredPatients.filter(p => {
-                const nafScore = parseFloat(p.nafScore);
-                return nafScore >= 6;
-            }).length;
+const needFollowUp = filteredPatients.filter(p => {
+    const nafScore = parseFloat(p.nafScore);
+    return nafScore >= 6;
+}).length;
             
             // นับจำนวนที่ติดตามแล้ว (มีการบันทึก follow up)
             const followedUp = filteredPatients.filter(p => 
@@ -2237,15 +2369,21 @@ function sortTable(column) {
                 return;
             }
             
-            // แบ่งกลุ่ม NAF ตามเกณฑ์ใหม่
-            const nafGroups = { 'ต่ำ (<6)': 0, 'Moderate (6-10)': 0, 'Severe (≥11)': 0 };
-            filteredPatients.forEach(p => {
-                const score = parseFloat(p.nafScore);
-                if (score >= 11) nafGroups['Severe (≥11)']++;
-                else if (score >= 6) nafGroups['Moderate (6-10)']++;
-                else if (score >= 0) nafGroups['ต่ำ (<6)']++;
-            });
-
+            // แบ่งกลุ่ม NAF ตามเกณฑ์ใหม่ (นับ 0 ด้วย)
+// แบ่งกลุ่ม NAF (นับ 0 เข้ากลุ่มต่ำ)
+const nafGroups = { 'ต่ำ (<6)': 0, 'Moderate (6-10)': 0, 'Severe (≥11)': 0 };
+filteredPatients.forEach(p => {
+    const score = parseFloat(p.nafScore);
+    
+    // นับทุกค่า รวม NaN และ 0
+    if (isNaN(score) || score < 6) {
+        nafGroups['ต่ำ (<6)']++;
+    } else if (score >= 11) {
+        nafGroups['Severe (≥11)']++;
+    } else {
+        nafGroups['Moderate (6-10)']++;
+    }
+});
             const wardGroups = {};
             filteredPatients.forEach(p => {
                 if (p.ward) {
@@ -2660,6 +2798,7 @@ function renderMonthlyComparison() {
         const date = new Date(p.recordDate);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
+        // สร้าง object ถ้ายังไม่มี
         if (!monthlyData[monthKey]) {
             monthlyData[monthKey] = { 
                 'ต่ำ (<6)': 0, 
@@ -2670,10 +2809,13 @@ function renderMonthlyComparison() {
         }
         
         const nafScore = parseFloat(p.nafScore);
-        if (nafScore >= 11) monthlyData[monthKey]['Severe (≥11)']++;
-        else if (nafScore >= 6) monthlyData[monthKey]['Moderate (6-10)']++;
-        else if (nafScore >= 0) monthlyData[monthKey]['ต่ำ (<6)']++;
-        
+        if (isNaN(nafScore) || nafScore < 6) {
+            monthlyData[monthKey]['ต่ำ (<6)']++;
+        } else if (nafScore >= 11) {
+            monthlyData[monthKey]['Severe (≥11)']++;
+        } else {
+            monthlyData[monthKey]['Moderate (6-10)']++;
+        }
         monthlyData[monthKey].total++;
     });
 
@@ -2686,7 +2828,6 @@ function renderMonthlyComparison() {
 
     renderComparisonView(sortedMonths, labels, monthlyData, 'รายเดือน');
 }
-
 function renderYearlyComparison() {
     const yearlyData = {};
     
