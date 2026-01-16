@@ -1,0 +1,2016 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบันทึกการเรียนทำอาหารทางสาย</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            border-left: 4px solid #48C9B0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, -20px); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(33, 150, 243, 0.4);
+        }
+
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .stat-card:nth-child(2):hover {
+            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4);
+        }
+
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .stat-card:nth-child(3):hover {
+            box-shadow: 0 12px 35px rgba(255, 152, 0, 0.4);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 15px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #42A5F5;
+            box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #EF5350 0%, #F44336 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .checkbox-item:hover {
+            background: #E0F7FA;
+            transform: scale(1.05);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #42A5F5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border: none;
+            font-size: 13px;
+        }
+
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #E3F2FD;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            color: white;
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+            color: white;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .download-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            width: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 28px 20px;
+            border-radius: 24px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .sync-status.syncing {
+            background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+            color: white;
+        }
+
+        .sync-status.synced {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            color: white;
+        }
+
+        .sync-status.error {
+            background: linear-gradient(135deg, #EF5350 0%, #F44336 100%);
+            color: white;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(3px);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            #mobile-menu-toggle {
+                display: block !important;
+            }
+
+            #sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                height: 100%;
+                width: 280px;
+                z-index: 1500;
+                transition: left 0.3s ease;
+            }
+
+            #sidebar.active {
+                left: 0;
+            }
+
+            #mobile-menu-close {
+                display: block !important;
+            }
+
+            #main-content {
+                padding: 70px 16px 16px 16px !important;
+            }
+
+            .card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-icon {
+                font-size: 32px;
+            }
+
+            .form-input, .form-select {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 15px;
+                padding: 12px 20px;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .filter-section > div {
+                width: 100%;
+            }
+
+            .filter-section select {
+                width: 100% !important;
+            }
+
+            .chart-container {
+                height: 220px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-group button {
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .modal-content {
+                padding: 24px 16px;
+                margin: 10px;
+            }
+
+            h2 {
+                font-size: 24px !important;
+            }
+
+            h3 {
+                font-size: 18px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card p {
+                font-size: 32px !important;
+            }
+
+            .checkbox-item {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+   <div class="loading-spinner"></div>
+  </div><button id="mobile-menu-toggle" style="display: none; position: fixed; top: 16px; left: 16px; z-index: 2000; background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%); color: white; border: none; border-radius: 12px; padding: 12px 16px; font-size: 24px; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4); cursor: pointer;"> ☰ </button>
+  <div class="w-full h-full flex" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%);">
+   <div id="sidebar" style="width: 280px; background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%); padding: 28px; overflow-y: auto; box-shadow: 4px 0 20px rgba(0,0,0,0.1);"><button id="mobile-menu-close" style="display: none; position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 20px; cursor: pointer;"> ✕ </button>
+    <div style="text-align: center; margin-bottom: 12px;">
+     <div style="font-size: 64px; margin-bottom: 8px;">
+      🍲
+     </div>
+    </div>
+    <h1 style="color: white; font-size: 20px; font-weight: 700; margin-bottom: 8px; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); line-height: 1.3;" id="sidebar-title">ระบบบันทึกข้อมูลการเรียนทำอาหารทางสาย</h1>
+    <div id="sync-indicator" class="sync-status synced" style="display: flex; justify-content: center; margin: 0 auto 24px; width: fit-content;">
+     ✓ เชื่อมต่อแล้ว
+    </div>
+    <div class="nav-item active" data-page="home" style="padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; color: white; font-weight: 600; font-size: 15px;"><span style="font-size: 20px; margin-right: 12px;">🏠</span> หน้าหลัก
+    </div>
+    <div class="nav-item" data-page="add-patient" style="padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; color: white; font-weight: 600; font-size: 15px;"><span style="font-size: 20px; margin-right: 12px;">✏️</span> บันทึกข้อมูลผู้ป่วย
+    </div>
+    <div class="nav-item" data-page="dashboard" style="padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; color: white; font-weight: 600; font-size: 15px;"><span style="font-size: 20px; margin-right: 12px;">📊</span> Dashboard
+    </div>
+    <div class="nav-item" data-page="data-table" style="padding: 14px 18px; margin-bottom: 10px; border-radius: 12px; color: white; font-weight: 600; font-size: 15px;"><span style="font-size: 20px; margin-right: 12px;">📋</span> ตารางข้อมูล
+    </div>
+   </div>
+   <div id="main-content" style="flex: 1; padding: 36px; overflow-y: auto; background: linear-gradient(to bottom, #E0F7FA 0%, #FFFFFF 100%);">
+    <div id="home-page" class="page active">
+     <div class="card">
+      <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 72px;">👨‍⚕️</span>
+      </div>
+      <h2 style="font-size: 28px; font-weight: 700; color: #2196F3; margin-bottom: 24px; text-align: center; line-height: 1.4;" id="home-title">ระบบบันทึกข้อมูลการเรียนทำอาหารทางสาย</h2>
+      <div style="text-align: center;"><button class="btn btn-primary" id="add-patient-btn" style="max-width: 300px;"> <span style="font-size: 20px; margin-right: 8px;">➕</span> เพิ่มผู้ป่วยใหม่ </button>
+      </div>
+     </div>
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+      <div class="stat-card">
+       <div class="stat-icon">
+        👥
+       </div>
+       <h3 style="font-size: 15px; margin-bottom: 8px; opacity: 0.95; font-weight: 600;">ผู้ป่วยทั้งหมด</h3>
+       <p style="font-size: 38px; font-weight: 700;" id="total-patients">0</p>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon">
+        ✅
+       </div>
+       <h3 style="font-size: 15px; margin-bottom: 8px; opacity: 0.95; font-weight: 600;">ติดตามแล้ว</h3>
+       <p style="font-size: 38px; font-weight: 700;" id="followed-up">0</p>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon">
+        ⏳
+       </div>
+       <h3 style="font-size: 15px; margin-bottom: 8px; opacity: 0.95; font-weight: 600;">รอติดตาม</h3>
+       <p style="font-size: 38px; font-weight: 700;" id="pending-follow-up">0</p>
+      </div>
+     </div>
+    </div>
+    <div id="add-patient-page" class="page">
+     <div class="card">
+      <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 48px;">📝</span>
+      </div>
+      <h2 style="font-size: 26px; font-weight: 700; color: #2196F3; margin-bottom: 24px; text-align: center;">บันทึกข้อมูลผู้ป่วยใหม่</h2>
+      <form id="patient-form">
+       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <div><label class="form-label" for="learning-date">📅 วันที่เรียนทำอาหารทางสาย <span style="color: #42A5F5;">*</span></label> <input type="date" id="learning-date" class="form-input" required>
+        </div>
+        <div><label class="form-label" for="hn">🏥 HN <span style="color: #42A5F5;">*</span></label> <input type="text" id="hn" class="form-input" placeholder="รหัส HN" required>
+        </div>
+        <div><label class="form-label" for="first-name">👤 ชื่อ <span style="color: #42A5F5;">*</span></label> <input type="text" id="first-name" class="form-input" placeholder="ชื่อผู้ป่วย" required>
+        </div>
+        <div><label class="form-label" for="last-name">👤 สกุล <span style="color: #42A5F5;">*</span></label> <input type="text" id="last-name" class="form-input" placeholder="นามสกุล" required>
+        </div>
+        <div><label class="form-label" for="ward">🏨 หอผู้ป่วย <span style="color: #42A5F5;">*</span></label> <select id="ward" class="form-select" required> <option value="">-- เลือกหอผู้ป่วย --</option> <option value="MED">MED</option> <option value="SURG">SURG</option> <option value="5">5</option> <option value="6">6</option> <option value="8">8</option> </select>
+        </div>
+        <div><label class="form-label" for="concentration">⚗️ ความเข้มข้น <span style="color: #42A5F5;">*</span></label> <select id="concentration" class="form-select" required> <option value="">-- เลือกความเข้มข้น --</option> <option value="1:1">1:1</option> <option value="1.2:1">1.2:1</option> <option value="1.5:1">1.5:1</option> <option value="2:1">2:1</option> </select>
+        </div>
+        <div><label class="form-label" for="amount-per-meal">🥛 ปริมาณต่อมื้อ (ml) <span style="color: #42A5F5;">*</span></label> <input type="number" id="amount-per-meal" class="form-input" placeholder="เช่น 250" required>
+        </div>
+        <div><label class="form-label" for="meals-per-day">🍽️ จำนวนมื้อต่อวัน <span style="color: #42A5F5;">*</span></label> <input type="number" id="meals-per-day" class="form-input" placeholder="เช่น 6" required>
+        </div>
+       </div>
+       <div style="margin-top: 20px;"><label class="form-label">🍲 สูตรอาหารทางสาย <span style="color: #42A5F5;">*</span></label>
+        <div class="checkbox-group">
+         <div class="checkbox-item"><input type="checkbox" id="formula-normal" value="ธรรมดา"> <label for="formula-normal">ธรรมดา</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-dm" value="DM"> <label for="formula-dm">DM</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-ls" value="LS"> <label for="formula-ls">LS</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-lf" value="LF"> <label for="formula-lf">LF</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-gout" value="gout"> <label for="formula-gout">gout</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-ckd" value="CKD"> <label for="formula-ckd">CKD</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-veg" value="มังสวิรัติ"> <label for="formula-veg">มังสวิรัติ</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-vegan" value="เจ"> <label for="formula-vegan">เจ</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="formula-other" value="อื่นๆ"> <label for="formula-other">อื่นๆ (ระบุ)</label>
+         </div>
+        </div>
+        <div id="other-formula-container" style="margin-top: 12px; display: none;"><input type="text" id="other-formula-text" class="form-input" placeholder="ระบุสูตรอาหารอื่นๆ...">
+        </div>
+       </div>
+       <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px;">
+        <div><label class="form-label" for="follow-up-date">📞 วันที่ติดตาม / Follow up</label> <input type="date" id="follow-up-date" class="form-input">
+        </div>
+       </div>
+       <div style="margin-top: 20px;"><label class="form-label">💬 ช่องทางการติดตาม</label>
+        <div class="checkbox-group">
+         <div class="checkbox-item"><input type="checkbox" id="channel-dms" value="DMS"> <label for="channel-dms">DMS</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="channel-line" value="line"> <label for="channel-line">Line</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="channel-tel" value="Telephone"> <label for="channel-tel">☎️ Telephone</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="channel-no-contact" value="ติดต่อไม่ได้"> <label for="channel-no-contact">❌ ติดต่อไม่ได้</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="channel-no-follow" value="non follow up"> <label for="channel-no-follow">⚠️ Non follow up</label>
+         </div>
+        </div>
+       </div>
+       <div style="margin-top: 20px;"><label class="form-label">📋 ผลการติดตาม</label>
+        <div class="checkbox-group">
+         <div class="checkbox-item"><input type="checkbox" id="result-blenderized" value="Blenderized diet"> <label for="result-blenderized">🥣 Blenderized diet</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="result-commercial" value="Commercial formula"> <label for="result-commercial">🧪 Commercial formula</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="result-oral" value="Oral diet"> <label for="result-oral">🍽️ Oral diet</label>
+         </div>
+         <div class="checkbox-item"><input type="checkbox" id="result-other" value="อื่นๆ"> <label for="result-other">อื่นๆ (ระบุ)</label>
+         </div>
+        </div>
+        <div id="other-result-container" style="margin-top: 12px; display: none;"><input type="text" id="other-result-text" class="form-input" placeholder="ระบุผลการติดตามอื่นๆ...">
+        </div>
+        <div style="margin-top: 16px;"><label class="form-label" for="additional-details">📝 รายละเอียดเพิ่มเติม</label> <textarea id="additional-details" class="form-input" rows="3" placeholder="ระบุรายละเอียด..."></textarea>
+        </div>
+       </div>
+       <div style="margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;"><button type="submit" class="btn btn-primary" id="submit-btn"> 💾 บันทึกข้อมูล </button> <button type="button" class="btn btn-secondary" id="clear-form-btn"> 🔄 ล้างฟอร์ม </button>
+       </div>
+      </form>
+     </div>
+    </div>
+    <div id="dashboard-page" class="page">
+     <div style="text-align: center; margin-bottom: 20px;"><span style="font-size: 56px;">📊</span>
+      <h2 style="font-size: 28px; font-weight: 700; color: #2196F3; margin-top: 12px;">Dashboard</h2>
+     </div>
+     <div class="card">
+      <div class="filter-section">
+       <div><label class="form-label" style="margin-bottom: 4px;">จากเดือน</label> <select id="filter-month-from" class="form-select" style="width: 180px;"> <option value="">เลือกเดือน</option> <option value="1">มกราคม</option> <option value="2">กุมภาพันธ์</option> <option value="3">มีนาคม</option> <option value="4">เมษายน</option> <option value="5">พฤษภาคม</option> <option value="6">มิถุนายน</option> <option value="7">กรกฎาคม</option> <option value="8">สิงหาคม</option> <option value="9">กันยายน</option> <option value="10">ตุลาคม</option> <option value="11">พฤศจิกายน</option> <option value="12">ธันวาคม</option> </select>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ปี</label> <select id="filter-year-from" class="form-select" style="width: 130px;"> <option value="">เลือกปี</option> </select>
+       </div>
+       <div style="display: flex; align-items: center; margin-top: 28px;"><span style="color: #6b7280; font-weight: 500;">ถึง</span>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ถึงเดือน</label> <select id="filter-month-to" class="form-select" style="width: 180px;"> <option value="">เลือกเดือน</option> <option value="1">มกราคม</option> <option value="2">กุมภาพันธ์</option> <option value="3">มีนาคม</option> <option value="4">เมษายน</option> <option value="5">พฤษภาคม</option> <option value="6">มิถุนายน</option> <option value="7">กรกฎาคม</option> <option value="8">สิงหาคม</option> <option value="9">กันยายน</option> <option value="10">ตุลาคม</option> <option value="11">พฤศจิกายน</option> <option value="12">ธันวาคม</option> </select>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ปี</label> <select id="filter-year-to" class="form-select" style="width: 130px;"> <option value="">เลือกปี</option> </select>
+       </div>
+       <div style="margin-top: 28px;"><button class="btn btn-secondary" id="clear-filter-dashboard-btn" style="padding: 10px 20px;"> 🔄 ล้างตัวกรอง </button>
+       </div>
+      </div>
+     </div>
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="stat-card">
+       <div class="stat-icon">
+        👥
+       </div>
+       <h3 style="font-size: 15px; margin-bottom: 8px; opacity: 0.95; font-weight: 600;">ผู้ป่วยทั้งหมด</h3>
+       <p style="font-size: 38px; font-weight: 700;" id="dash-total">0</p>
+      </div>
+      <div class="stat-card">
+       <div class="stat-icon">
+        ✅
+       </div>
+       <h3 style="font-size: 15px; margin-bottom: 8px; opacity: 0.95; font-weight: 600;">ติดตามแล้ว</h3>
+       <p style="font-size: 38px; font-weight: 700;" id="dash-followed">0</p>
+      </div>
+     </div>
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+      <div class="card">
+       <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #2196F3;"><span style="font-size: 22px; margin-right: 8px;">🏥</span>จำนวนผู้ป่วยแยกตามหอ</h3>
+       <div class="chart-container">
+        <canvas id="ward-chart"></canvas>
+       </div><button class="download-btn" onclick="downloadChart('ward-chart', 'จำนวนผู้ป่วยแยกตามหอ')"> 💾 บันทึกเป็นรูปภาพ </button>
+      </div>
+      <div class="card">
+       <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #2196F3;"><span style="font-size: 22px; margin-right: 8px;">💬</span>ช่องทางการติดตาม</h3>
+       <div class="chart-container">
+        <canvas id="channel-chart"></canvas>
+       </div><button class="download-btn" onclick="downloadChart('channel-chart', 'ช่องทางการติดตาม')"> 💾 บันทึกเป็นรูปภาพ </button>
+      </div>
+      <div class="card">
+       <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #2196F3;"><span style="font-size: 22px; margin-right: 8px;">📋</span>ผลการติดตาม</h3>
+       <div class="chart-container">
+        <canvas id="result-chart"></canvas>
+       </div><button class="download-btn" onclick="downloadChart('result-chart', 'ผลการติดตาม')"> 💾 บันทึกเป็นรูปภาพ </button>
+      </div>
+      <div class="card">
+       <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #2196F3;"><span style="font-size: 22px; margin-right: 8px;">📈</span>แนวโน้มผู้ป่วยรายเดือน(วันที่ติดตาม)</h3>
+       <div class="chart-container">
+        <canvas id="trend-chart"></canvas>
+       </div><button class="download-btn" onclick="downloadChart('trend-chart', 'แนวโน้มผู้ป่วยรายเดือน-วันที่ติดตาม')"> 💾 บันทึกเป็นรูปภาพ </button>
+      </div>
+<div class="card">
+  <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #2196F3;"><span style="font-size: 22px; margin-right: 8px;">📅</span>แนวโน้มผู้ป่วยรายเดือน(วันที่มาเรียน)</h3>
+  <div class="chart-container">
+    <canvas id="learning-trend-chart"></canvas>
+  </div>
+  <button class="download-btn" onclick="downloadChart('learning-trend-chart', 'แนวโน้มผู้ป่วยรายเดือน-วันที่มาเรียน')"> 💾 บันทึกเป็นรูปภาพ </button>
+</div>
+     </div>
+    </div>
+    <div id="data-table-page" class="page">
+     <div class="card">
+      <div style="text-align: center; margin-bottom: 20px;"><span style="font-size: 56px;">📊</span>
+       <h2 style="font-size: 28px; font-weight: 700; color: #2196F3; margin-top: 12px;">ตารางข้อมูล</h2>
+      </div>
+      <div style="margin-bottom: 20px;"><label class="form-label" style="margin-bottom: 8px;">🔍 ค้นหาข้อมูล</label> <input type="text" id="search-input" class="form-input" placeholder="ค้นหาด้วย HN, ชื่อ, สกุล, หอผู้ป่วย...">
+      </div>
+      <div class="filter-section">
+       <div><label class="form-label" style="margin-bottom: 4px;">จากเดือน</label> <select id="table-filter-month-from" class="form-select" style="width: 180px;"> <option value="">เลือกเดือน</option> <option value="1">มกราคม</option> <option value="2">กุมภาพันธ์</option> <option value="3">มีนาคม</option> <option value="4">เมษายน</option> <option value="5">พฤษภาคม</option> <option value="6">มิถุนายน</option> <option value="7">กรกฎาคม</option> <option value="8">สิงหาคม</option> <option value="9">กันยายน</option> <option value="10">ตุลาคม</option> <option value="11">พฤศจิกายน</option> <option value="12">ธันวาคม</option> </select>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ปี</label> <select id="table-filter-year-from" class="form-select" style="width: 130px;"> <option value="">เลือกปี</option> </select>
+       </div>
+       <div style="display: flex; align-items: center; margin-top: 28px;"><span style="color: #6b7280; font-weight: 500;">ถึง</span>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ถึงเดือน</label> <select id="table-filter-month-to" class="form-select" style="width: 180px;"> <option value="">เลือกเดือน</option> <option value="1">มกราคม</option> <option value="2">กุมภาพันธ์</option> <option value="3">มีนาคม</option> <option value="4">เมษายน</option> <option value="5">พฤษภาคม</option> <option value="6">มิถุนายน</option> <option value="7">กรกฎาคม</option> <option value="8">สิงหาคม</option> <option value="9">กันยายน</option> <option value="10">ตุลาคม</option> <option value="11">พฤศจิกายน</option> <option value="12">ธันวาคม</option> </select>
+       </div>
+       <div><label class="form-label" style="margin-bottom: 4px;">ปี</label> <select id="table-filter-year-to" class="form-select" style="width: 130px;"> <option value="">เลือกปี</option> </select>
+       </div>
+       <div style="margin-top: 28px;"><button class="btn btn-secondary" id="clear-filter-table-btn" style="padding: 10px 20px;"> 🔄 ล้างตัวกรอง </button>
+       </div>
+      </div>
+      <div style="overflow-x: auto;">
+       <table id="data-table">
+        <thead>
+         <tr>
+          <th>📅 วันที่เรียน</th>
+          <th>🏥 HN</th>
+          <th>👤 ชื่อ-สกุล</th>
+          <th>🏨 หอผู้ป่วย</th>
+          <th>🍲 สูตรอาหาร</th>
+          <th>⚗️ ความเข้มข้น</th>
+          <th>📞 วันที่ติดตาม</th>
+          <th>💬 ช่องทาง</th>
+          <th>✅ สถานะ</th>
+          <th>⚙️ การจัดการ</th>
+         </tr>
+        </thead>
+        <tbody id="table-body">
+         <tr>
+          <td colspan="10" style="text-align: center; padding: 40px; color: #9ca3af;">กำลังโหลดข้อมูล...</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div id="edit-modal" class="modal">
+   <div class="modal-content">
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 48px;">✏️</span>
+    </div>
+    <h2 style="font-size: 24px; font-weight: 700; color: #2196F3; margin-bottom: 24px; text-align: center;">แก้ไขข้อมูลผู้ป่วย</h2>
+    <form id="edit-form"><input type="hidden" id="edit-id">
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+      <div><label class="form-label" for="edit-learning-date">📅 วันที่เรียนทำอาหารทางสาย <span style="color: #42A5F5;">*</span></label> <input type="date" id="edit-learning-date" class="form-input" required>
+      </div>
+      <div><label class="form-label" for="edit-hn">🏥 HN <span style="color: #42A5F5;">*</span></label> <input type="text" id="edit-hn" class="form-input" placeholder="รหัส HN" required>
+      </div>
+      <div><label class="form-label" for="edit-first-name">👤 ชื่อ <span style="color: #42A5F5;">*</span></label> <input type="text" id="edit-first-name" class="form-input" placeholder="ชื่อผู้ป่วย" required>
+      </div>
+      <div><label class="form-label" for="edit-last-name">👤 สกุล <span style="color: #42A5F5;">*</span></label> <input type="text" id="edit-last-name" class="form-input" placeholder="นามสกุล" required>
+      </div>
+      <div><label class="form-label" for="edit-ward">🏨 หอผู้ป่วย <span style="color: #42A5F5;">*</span></label> <select id="edit-ward" class="form-select" required> <option value="">-- เลือกหอผู้ป่วย --</option> <option value="MED">MED</option> <option value="SURG">SURG</option> <option value="5">5</option> <option value="6">6</option> <option value="8">8</option> </select>
+      </div>
+      <div><label class="form-label" for="edit-concentration">⚗️ ความเข้มข้น <span style="color: #42A5F5;">*</span></label> <select id="edit-concentration" class="form-select" required> <option value="">-- เลือกความเข้มข้น --</option> <option value="1:1">1:1</option> <option value="1.2:1">1.2:1</option> <option value="1.5:1">1.5:1</option> <option value="2:1">2:1</option> </select>
+      </div>
+      <div><label class="form-label" for="edit-amount-per-meal">🥛 ปริมาณต่อมื้อ (ml) <span style="color: #42A5F5;">*</span></label> <input type="number" id="edit-amount-per-meal" class="form-input" placeholder="เช่น 250" required>
+      </div>
+      <div><label class="form-label" for="edit-meals-per-day">🍽️ จำนวนมื้อต่อวัน <span style="color: #42A5F5;">*</span></label> <input type="number" id="edit-meals-per-day" class="form-input" placeholder="เช่น 6" required>
+      </div>
+     </div>
+     <div style="margin-top: 20px;"><label class="form-label">🍲 สูตรอาหารทางสาย <span style="color: #42A5F5;">*</span></label>
+      <div class="checkbox-group">
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-normal" value="ธรรมดา"> <label for="edit-formula-normal">ธรรมดา</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-dm" value="DM"> <label for="edit-formula-dm">DM</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-ls" value="LS"> <label for="edit-formula-ls">LS</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-lf" value="LF"> <label for="edit-formula-lf">LF</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-gout" value="gout"> <label for="edit-formula-gout">gout</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-ckd" value="CKD"> <label for="edit-formula-ckd">CKD</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-veg" value="มังสวิรัติ"> <label for="edit-formula-veg">มังสวิรัติ</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-vegan" value="เจ"> <label for="edit-formula-vegan">เจ</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-formula-other" value="อื่นๆ"> <label for="edit-formula-other">อื่นๆ</label>
+       </div>
+      </div>
+     </div>
+     <div style="display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px;">
+      <div><label class="form-label" for="edit-follow-up-date">📞 วันที่ติดตาม / Follow up</label> <input type="date" id="edit-follow-up-date" class="form-input">
+      </div>
+     </div>
+     <div style="margin-top: 20px;"><label class="form-label">💬 ช่องทางการติดตาม</label>
+      <div class="checkbox-group">
+       <div class="checkbox-item"><input type="checkbox" id="edit-channel-dms" value="DMS"> <label for="edit-channel-dms">DMS</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-channel-line" value="line"> <label for="edit-channel-line">Line</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-channel-tel" value="Telephone"> <label for="edit-channel-tel">☎️ Telephone</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-channel-no-contact" value="ติดต่อไม่ได้"> <label for="edit-channel-no-contact">❌ ติดต่อไม่ได้</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-channel-no-follow" value="non follow up"> <label for="edit-channel-no-follow">⚠️ Non follow up</label>
+       </div>
+      </div>
+     </div>
+     <div style="margin-top: 20px;"><label class="form-label">📋 ผลการติดตาม</label>
+      <div class="checkbox-group">
+       <div class="checkbox-item"><input type="checkbox" id="edit-result-blenderized" value="Blenderized diet"> <label for="edit-result-blenderized">🥣 Blenderized diet</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-result-commercial" value="Commercial formula"> <label for="edit-result-commercial">🧪 Commercial formula</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-result-oral" value="Oral diet"> <label for="edit-result-oral">🍽️ Oral diet</label>
+       </div>
+       <div class="checkbox-item"><input type="checkbox" id="edit-result-other" value="อื่นๆ"> <label for="edit-result-other">อื่นๆ</label>
+       </div>
+      </div>
+      <div style="margin-top: 16px;"><label class="form-label" for="edit-additional-details">📝 รายละเอียดเพิ่มเติม</label> <textarea id="edit-additional-details" class="form-input" rows="3" placeholder="ระบุรายละเอียด..."></textarea>
+      </div>
+     </div>
+     <div style="margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;"><button type="button" class="btn btn-secondary" id="cancel-edit-btn"> ❌ ยกเลิก </button> <button type="submit" class="btn btn-success" id="save-edit-btn"> 💾 บันทึกการแก้ไข </button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <script>
+        const defaultConfig = {
+            app_title: "ระบบบันทึกข้อมูลการเรียนทำอาหารทางสาย"
+        };
+
+       const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbytNKPhpMn_09Koz7AElM-v4uCNUxpWpLzJTbfJbh_62uoO_OKMQeMTmAPMn4L_m8XDgA/exec';
+
+        let allPatients = [];
+        let charts = {};
+
+        Chart.register(ChartDataLabels);
+
+        async function initializeApp() {
+            setupEventListeners();
+            updateYearFilter();
+            setupMobileMenu();
+            await loadDataFromGoogleSheets();
+        }
+
+        function setupMobileMenu() {
+            const menuToggle = document.getElementById('mobile-menu-toggle');
+            const menuClose = document.getElementById('mobile-menu-close');
+            const sidebar = document.getElementById('sidebar');
+            
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.add('active');
+            });
+            
+            menuClose.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+            });
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                });
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // ฟังก์ชัน loadDataFromGoogleSheets อยู่หลังฟังก์ชัน setSyncStatus
+function setSyncStatus(status, message) {
+    const indicator = document.getElementById('sync-indicator');
+    indicator.className = 'sync-status ' + status;
+    indicator.textContent = message;
+}
+
+async function loadDataFromGoogleSheets() { 
+    showLoading();
+    setSyncStatus('syncing', '⟳ กำลังโหลด...');
+    
+    try {
+        const response = await fetch(GOOGLE_SCRIPT_URL + '?action=read'); // <-- บรรทัดที่แก้ไข
+        const result = await response.json();
+                
+                if (result.success) {
+                    allPatients = result.data.map(row => ({
+                        ID: row.ID,
+                        learning_date: row['วันที่เรียน'] || '',
+                        hn: row.HN || '',
+                        first_name: row['ชื่อ'] || '',
+                        last_name: row['สกุล'] || '',
+                        ward: row['หอผู้ป่วย'] || '',
+                        formula_type: row['สูตรอาหาร'] || '',
+                        concentration: row['ความเข้มข้น'] || '',
+                        amount_per_meal: row['ปริมาณต่อมื้อ'] || '',
+                        meals_per_day: row['มื้อต่อวัน'] || '',
+                        follow_up_date: row['วันที่ติดตาม'] || '',
+                        follow_up_channel: row['ช่องทาง'] || '',
+                        follow_up_result: row['ผลการติดตาม'] || '',
+                        additional_details: row['รายละเอียด'] || '',
+                        is_followed_up: row['สถานะติดตาม'] === 'ติดตามแล้ว',
+                        created_at: row['วันที่บันทึก'] || ''
+                    }));
+                    
+                    updateHomePage();
+                    updateDashboard();
+                    updateDataTable();
+                    setSyncStatus('synced', '✓ เชื่อมต่อแล้ว');
+                } else {
+                    setSyncStatus('error', '⚠ เชื่อมต่อล้มเหลว');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ไม่สามารถโหลดข้อมูล',
+                        text: 'กรุณาตรวจสอบการเชื่อมต่อ',
+                        confirmButtonColor: '#42A5F5'
+                    });
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                setSyncStatus('error', '⚠ เชื่อมต่อล้มเหลว');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อ Google Sheets ได้',
+                    confirmButtonColor: '#42A5F5'
+                });
+            }
+            
+            hideLoading();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    navigateToPage(pageId);
+                });
+            });
+
+            document.getElementById('add-patient-btn').addEventListener('click', () => {
+                navigateToPage('add-patient');
+            });
+
+            document.getElementById('patient-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitPatientData();
+            });
+
+            document.getElementById('clear-form-btn').addEventListener('click', () => {
+                document.getElementById('patient-form').reset();
+            });
+
+            document.getElementById('filter-month-from').addEventListener('change', updateDashboard);
+            document.getElementById('filter-year-from').addEventListener('change', updateDashboard);
+            document.getElementById('filter-month-to').addEventListener('change', updateDashboard);
+            document.getElementById('filter-year-to').addEventListener('change', updateDashboard);
+            
+            document.getElementById('clear-filter-dashboard-btn').addEventListener('click', () => {
+                document.getElementById('filter-month-from').value = '';
+                document.getElementById('filter-year-from').value = '';
+                document.getElementById('filter-month-to').value = '';
+                document.getElementById('filter-year-to').value = '';
+                updateDashboard();
+            });
+
+            document.getElementById('search-input').addEventListener('input', updateDataTable);
+
+            document.getElementById('table-filter-month-from').addEventListener('change', updateDataTable);
+            document.getElementById('table-filter-year-from').addEventListener('change', updateDataTable);
+            document.getElementById('table-filter-month-to').addEventListener('change', updateDataTable);
+            document.getElementById('table-filter-year-to').addEventListener('change', updateDataTable);
+            
+            document.getElementById('clear-filter-table-btn').addEventListener('click', () => {
+                document.getElementById('search-input').value = '';
+                document.getElementById('table-filter-month-from').value = '';
+                document.getElementById('table-filter-year-from').value = '';
+                document.getElementById('table-filter-month-to').value = '';
+                document.getElementById('table-filter-year-to').value = '';
+                updateDataTable();
+            });
+
+            document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+                closeEditModal();
+            });
+
+            document.getElementById('edit-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveEditedPatient();
+            });
+
+            document.getElementById('edit-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'edit-modal') {
+                    closeEditModal();
+                }
+            });
+        }
+
+        function navigateToPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            document.getElementById(pageId + '-page').classList.add('active');
+            document.querySelector(`.nav-item[data-page="${pageId}"]`).classList.add('active');
+
+            if (pageId === 'dashboard') {
+                updateDashboard();
+            } else if (pageId === 'data-table') {
+                updateDataTable();
+            }
+        }
+
+        async function submitPatientData() {
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="loading"></div> กำลังบันทึก...';
+
+            const formulas = [];
+            document.querySelectorAll('[id^="formula-"]:checked').forEach(cb => {
+                formulas.push(cb.value);
+            });
+            const formulaType = formulas.join(', ');
+
+            const channels = [];
+            document.querySelectorAll('[id^="channel-"]:checked').forEach(cb => {
+                channels.push(cb.value);
+            });
+
+            const results = [];
+            document.querySelectorAll('[id^="result-"]:checked').forEach(cb => {
+                results.push(cb.value);
+            });
+
+            const hasFollowUpResult = results.length > 0 || document.getElementById('additional-details').value.trim() !== '';
+
+            const patientData = {
+                learning_date: document.getElementById('learning-date').value,
+                hn: document.getElementById('hn').value,
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                ward: document.getElementById('ward').value,
+                formula_type: formulaType,
+                concentration: document.getElementById('concentration').value,
+                amount_per_meal: document.getElementById('amount-per-meal').value,
+                meals_per_day: document.getElementById('meals-per-day').value,
+                follow_up_date: document.getElementById('follow-up-date').value,
+                follow_up_channel: channels.join(', '),
+                follow_up_result: results.join(', '),
+                additional_details: document.getElementById('additional-details').value,
+                is_followed_up: hasFollowUpResult
+            };
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create',
+                        record: patientData
+                    })
+                });
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ',
+                    text: 'ข้อมูลผู้ป่วยถูกบันทึกไปยัง Google Sheets แล้ว',
+                    confirmButtonColor: '#42A5F5',
+                    timer: 2000
+                });
+                
+                document.getElementById('patient-form').reset();
+                
+                await loadDataFromGoogleSheets();
+                
+            } catch (error) {
+                console.error('Submit error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    confirmButtonColor: '#42A5F5'
+                });
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '💾 บันทึกข้อมูล';
+        }
+
+        function updateHomePage() {
+            const total = allPatients.length;
+            const followedUp = allPatients.filter(p => p.is_followed_up).length;
+            const pending = total - followedUp;
+
+            document.getElementById('total-patients').textContent = total;
+            document.getElementById('followed-up').textContent = followedUp;
+            document.getElementById('pending-follow-up').textContent = pending;
+        }
+
+        function updateYearFilter() {
+            const yearSelects = [
+                document.getElementById('filter-year-from'),
+                document.getElementById('filter-year-to'),
+                document.getElementById('table-filter-year-from'),
+                document.getElementById('table-filter-year-to')
+            ];
+            
+            const currentYear = new Date().getFullYear();
+            
+            yearSelects.forEach(yearSelect => {
+                for (let i = 0; i < 5; i++) {
+                    const year = currentYear - i;
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = (year + 543);
+                    yearSelect.appendChild(option);
+                }
+            });
+        }
+
+        function filterDataByDateRange(data, monthFrom, yearFrom, monthTo, yearTo) {
+            if (!monthFrom && !yearFrom && !monthTo && !yearTo) {
+                return data;
+            }
+
+            return data.filter(p => {
+                if (!p.learning_date) return false;
+                
+                const date = new Date(p.learning_date);
+                const itemMonth = date.getMonth() + 1;
+                const itemYear = date.getFullYear();
+
+                let fromDate = null;
+                let toDate = null;
+
+                if (monthFrom && yearFrom) {
+                    fromDate = new Date(yearFrom, monthFrom - 1, 1);
+                } else if (yearFrom) {
+                    fromDate = new Date(yearFrom, 0, 1);
+                } else if (monthFrom) {
+                    fromDate = new Date(itemYear, monthFrom - 1, 1);
+                }
+
+                if (monthTo && yearTo) {
+                    toDate = new Date(yearTo, monthTo, 0);
+                } else if (yearTo) {
+                    toDate = new Date(yearTo, 11, 31);
+                } else if (monthTo) {
+                    toDate = new Date(itemYear, monthTo, 0);
+                }
+
+                const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+                if (fromDate && toDate) {
+                    return itemDate >= fromDate && itemDate <= toDate;
+                } else if (fromDate) {
+                    return itemDate >= fromDate;
+                } else if (toDate) {
+                    return itemDate <= toDate;
+                }
+
+                return true;
+            });
+        }
+
+        function updateDashboard() {
+            const monthFrom = document.getElementById('filter-month-from').value;
+            const yearFrom = document.getElementById('filter-year-from').value;
+            const monthTo = document.getElementById('filter-month-to').value;
+            const yearTo = document.getElementById('filter-year-to').value;
+
+            const filteredData = filterDataByDateRange(allPatients, monthFrom, yearFrom, monthTo, yearTo);
+
+            const total = filteredData.length;
+            const followedUp = filteredData.filter(p => p.is_followed_up).length;
+
+            document.getElementById('dash-total').textContent = total;
+            document.getElementById('dash-followed').textContent = followedUp;
+
+            updateWardChart(filteredData);
+            updateChannelChart(filteredData);
+            updateResultChart(filteredData);
+            updateTrendChart(allPatients);
+                        updateLearningTrendChart(allPatients);
+        }
+
+        function updateWardChart(data) {
+            const wardCounts = {};
+            data.forEach(p => {
+                if (p.ward) {
+                    wardCounts[p.ward] = (wardCounts[p.ward] || 0) + 1;
+                }
+            });
+
+            const total = Object.values(wardCounts).reduce((a, b) => a + b, 0);
+
+            const ctx = document.getElementById('ward-chart');
+            if (charts.ward) {
+                charts.ward.destroy();
+            }
+
+            charts.ward = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(wardCounts),
+                    datasets: [{
+                        label: 'จำนวนผู้ป่วย',
+                        data: Object.values(wardCounts),
+                        backgroundColor: [
+                            'rgba(66, 165, 245, 0.8)',
+                            'rgba(102, 187, 106, 0.8)',
+                            'rgba(255, 167, 38, 0.8)',
+                            'rgba(239, 83, 80, 0.8)',
+                            'rgba(171, 71, 188, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(66, 165, 245, 1)',
+                            'rgba(102, 187, 106, 1)',
+                            'rgba(255, 167, 38, 1)',
+                            'rgba(239, 83, 80, 1)',
+                            'rgba(171, 71, 188, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `จำนวน: ${value} คน (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#333',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value, context) {
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${value} คน\n(${percentage}%)`;
+                            },
+                            anchor: 'end',
+                            align: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChannelChart(data) {
+            const channelCounts = {};
+            data.forEach(p => {
+                if (p.follow_up_channel) {
+                    const channels = p.follow_up_channel.split(',').map(c => c.trim());
+                    channels.forEach(channel => {
+                        if (channel) {
+                            channelCounts[channel] = (channelCounts[channel] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            const total = Object.values(channelCounts).reduce((a, b) => a + b, 0);
+
+            const ctx = document.getElementById('channel-chart');
+            if (charts.channel) {
+                charts.channel.destroy();
+            }
+
+            charts.channel = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(channelCounts),
+                    datasets: [{
+                        data: Object.values(channelCounts),
+                        backgroundColor: [
+                            'rgba(66, 165, 245, 0.8)',
+                            'rgba(102, 187, 106, 0.8)',
+                            'rgba(255, 167, 38, 0.8)',
+                            'rgba(239, 83, 80, 0.8)',
+                            'rgba(171, 71, 188, 0.8)'
+                        ],
+                        borderColor: 'white',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value, context) {
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateResultChart(data) {
+            const resultCounts = {};
+            data.forEach(p => {
+                if (p.follow_up_result) {
+                    const results = p.follow_up_result.split(',').map(r => r.trim());
+                    results.forEach(result => {
+                        if (result) {
+                            resultCounts[result] = (resultCounts[result] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            const total = Object.values(resultCounts).reduce((a, b) => a + b, 0);
+
+            const ctx = document.getElementById('result-chart');
+            if (charts.result) {
+                charts.result.destroy();
+            }
+
+            charts.result = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(resultCounts),
+                    datasets: [{
+                        data: Object.values(resultCounts),
+                        backgroundColor: [
+                            'rgba(66, 165, 245, 0.8)',
+                            'rgba(102, 187, 106, 0.8)',
+                            'rgba(255, 167, 38, 0.8)',
+                            'rgba(239, 83, 80, 0.8)'
+                        ],
+                        borderColor: 'white',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function(value, context) {
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTrendChart(data) {
+            const monthCounts = {};
+            
+            data.forEach(p => {
+                if (p.follow_up_date) { 
+                    const date = new Date(p.follow_up_date);
+                    const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+                    monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
+                }
+            });
+
+            const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
+                const [monthA, yearA] = a.split('/').map(Number);
+                const [monthB, yearB] = b.split('/').map(Number);
+                return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
+            });
+
+            const labels = sortedMonths.map(m => {
+                const [month, year] = m.split('/');
+                return `${month}/${year}`;
+            });
+
+            const ctx = document.getElementById('trend-chart');
+            if (charts.trend) {
+                charts.trend.destroy();
+            }
+
+            charts.trend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนผู้ป่วย (วันที่ติดตาม)',
+                        data: sortedMonths.map(m => monthCounts[m]),
+                        borderColor: 'rgba(66, 165, 245, 1)',
+                        backgroundColor: 'rgba(66, 165, 245, 0.2)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: 'rgba(66, 165, 245, 1)',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#333',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            formatter: function(value) {
+                                return `${value} คน`;
+                            },
+                            anchor: 'end',
+                            align: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+function updateLearningTrendChart(data) {
+    const monthCounts = {};
+    
+    data.forEach(p => {
+        if (p.learning_date) {
+            const date = new Date(p.learning_date);
+            const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+            monthCounts[monthYear] = (monthCounts[monthYear] || 0) + 1;
+        }
+    });
+
+    const sortedMonths = Object.keys(monthCounts).sort((a, b) => {
+        const [monthA, yearA] = a.split('/').map(Number);
+        const [monthB, yearB] = b.split('/').map(Number);
+        return new Date(yearA, monthA - 1) - new Date(yearB, monthB - 1);
+    });
+
+    const labels = sortedMonths.map(m => {
+        const [month, year] = m.split('/');
+        return `${month}/${year}`;
+    });
+
+    const ctx = document.getElementById('learning-trend-chart');
+    if (charts.learningTrend) {
+        charts.learningTrend.destroy();
+    }
+
+    charts.learningTrend = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'จำนวนผู้ป่วย (วันที่มาเรียน)',
+                data: sortedMonths.map(m => monthCounts[m]),
+                borderColor: 'rgba(102, 187, 106, 1)',
+                backgroundColor: 'rgba(102, 187, 106, 0.2)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: 'rgba(102, 187, 106, 1)',
+                pointBorderColor: 'white',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                datalabels: {
+                    display: true,
+                    color: '#333',
+                    font: {
+                        weight: 'bold',
+                        size: 11
+                    },
+                    formatter: function(value) {
+                        return `${value} คน`;
+                    },
+                    anchor: 'end',
+                    align: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+}
+        function updateDataTable() {
+            const searchTerm = (document.getElementById('search-input').value || '').toLowerCase().trim();
+            const monthFrom = document.getElementById('table-filter-month-from').value;
+            const yearFrom = document.getElementById('table-filter-year-from').value;
+            const monthTo = document.getElementById('table-filter-month-to').value;
+            const yearTo = document.getElementById('table-filter-year-to').value;
+
+            let filteredData = filterDataByDateRange(allPatients, monthFrom, yearFrom, monthTo, yearTo);
+
+            if (searchTerm) {
+                filteredData = filteredData.filter(patient => {
+                    const hn = String(patient.hn || '').toLowerCase();
+                    const firstName = String(patient.first_name || '').toLowerCase();
+                    const lastName = String(patient.last_name || '').toLowerCase();
+                    const ward = String(patient.ward || '').toLowerCase();
+                    const fullName = (firstName + ' ' + lastName).trim();
+                    
+                    return (
+                        hn.includes(searchTerm) ||
+                        firstName.includes(searchTerm) ||
+                        lastName.includes(searchTerm) ||
+                        ward.includes(searchTerm) ||
+                        fullName.includes(searchTerm)
+                    );
+                });
+            }
+
+            const tbody = document.getElementById('table-body');
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: #9ca3af;">ไม่พบข้อมูลที่ค้นหา</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            
+            filteredData.forEach(patient => {
+                const row = document.createElement('tr');
+                
+                const statusBadge = patient.is_followed_up 
+                    ? '<span class="badge badge-success">✅ ติดตามแล้ว</span>'
+                    : '<span class="badge badge-warning">⏳ รอติดตาม</span>';
+
+                row.innerHTML = `
+                    <td>${formatDate(patient.learning_date)}</td>
+                    <td>${patient.hn}</td>
+                    <td>${patient.first_name} ${patient.last_name}</td>
+                    <td>${patient.ward}</td>
+                    <td>${patient.formula_type}</td>
+                    <td>${patient.concentration}</td>
+                    <td>${patient.follow_up_date ? formatDate(patient.follow_up_date) : '-'}</td>
+                    <td>${patient.follow_up_channel || '-'}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="viewPatient('${patient.ID}')">👁️ ดู</button>
+                            <button class="btn btn-success" style="padding: 6px 12px; font-size: 13px;" onclick="editPatient('${patient.ID}')">✏️ แก้ไข</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 13px;" onclick="deletePatient('${patient.ID}')">🗑️ ลบ</button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        async function viewPatient(id) {
+            const patient = allPatients.find(p => p.ID === id);
+            if (!patient) return;
+
+            await Swal.fire({
+                title: '👤 ข้อมูลผู้ป่วย',
+                html: `
+                    <div style="text-align: left; max-height: 500px; overflow-y: auto;">
+                        <p><strong>📅 วันที่เรียน:</strong> ${formatDate(patient.learning_date)}</p>
+                        <p><strong>🏥 HN:</strong> ${patient.hn}</p>
+                        <p><strong>👤 ชื่อ-สกุล:</strong> ${patient.first_name} ${patient.last_name}</p>
+                        <p><strong>🏨 หอผู้ป่วย:</strong> ${patient.ward}</p>
+                        <p><strong>🍲 สูตรอาหาร:</strong> ${patient.formula_type}</p>
+                        <p><strong>⚗️ ความเข้มข้น:</strong> ${patient.concentration}</p>
+                        <p><strong>🥛 ปริมาณต่อมื้อ:</strong> ${patient.amount_per_meal} ml</p>
+                        <p><strong>🍽️ มื้อต่อวัน:</strong> ${patient.meals_per_day}</p>
+                        <p><strong>📞 วันที่ติดตาม:</strong> ${patient.follow_up_date ? formatDate(patient.follow_up_date) : '-'}</p>
+                        <p><strong>💬 ช่องทางติดตาม:</strong> ${patient.follow_up_channel || '-'}</p>
+                        <p><strong>📋 ผลการติดตาม:</strong> ${patient.follow_up_result || '-'}</p>
+                        <p><strong>📝 รายละเอียดเพิ่มเติม:</strong> ${patient.additional_details || '-'}</p>
+                        <p><strong>✅ สถานะ:</strong> ${patient.is_followed_up ? 'ติดตามแล้ว' : 'รอติดตาม'}</p>
+                    </div>
+                `,
+                width: '90%',
+                confirmButtonColor: '#42A5F5'
+            });
+        }
+
+        function editPatient(id) {
+            const patient = allPatients.find(p => p.ID === id);
+            if (!patient) return;
+
+            document.getElementById('edit-id').value = patient.ID;
+            document.getElementById('edit-learning-date').value = patient.learning_date;
+            document.getElementById('edit-hn').value = patient.hn;
+            document.getElementById('edit-first-name').value = patient.first_name;
+            document.getElementById('edit-last-name').value = patient.last_name;
+            document.getElementById('edit-ward').value = patient.ward;
+            document.getElementById('edit-concentration').value = patient.concentration;
+            document.getElementById('edit-amount-per-meal').value = patient.amount_per_meal;
+            document.getElementById('edit-meals-per-day').value = patient.meals_per_day;
+            document.getElementById('edit-follow-up-date').value = patient.follow_up_date;
+            document.getElementById('edit-additional-details').value = patient.additional_details;
+
+            document.querySelectorAll('[id^="edit-formula-"]').forEach(cb => cb.checked = false);
+            
+            if (patient.formula_type) {
+                const formulas = patient.formula_type.split(',').map(f => f.trim());
+                formulas.forEach(formula => {
+                    const checkbox = document.querySelector(`#edit-formula-normal[value="${formula}"], #edit-formula-dm[value="${formula}"], #edit-formula-ls[value="${formula}"], #edit-formula-lf[value="${formula}"], #edit-formula-gout[value="${formula}"], #edit-formula-ckd[value="${formula}"], #edit-formula-veg[value="${formula}"], #edit-formula-vegan[value="${formula}"], #edit-formula-other[value="${formula}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            document.querySelectorAll('[id^="edit-channel-"]').forEach(cb => cb.checked = false);
+            if (patient.follow_up_channel) {
+                const channels = patient.follow_up_channel.split(',').map(c => c.trim());
+                channels.forEach(channel => {
+                    const checkbox = document.querySelector(`#edit-channel-dms[value="${channel}"], #edit-channel-line[value="${channel}"], #edit-channel-tel[value="${channel}"], #edit-channel-no-contact[value="${channel}"], #edit-channel-no-follow[value="${channel}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            document.querySelectorAll('[id^="edit-result-"]').forEach(cb => cb.checked = false);
+            
+            if (patient.follow_up_result) {
+                const results = patient.follow_up_result.split(',').map(r => r.trim());
+                results.forEach(result => {
+                    const checkbox = document.querySelector(`#edit-result-blenderized[value="${result}"], #edit-result-commercial[value="${result}"], #edit-result-oral[value="${result}"], #edit-result-other[value="${result}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            openEditModal();
+        }
+
+        function openEditModal() {
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+        }
+
+        async function saveEditedPatient() {
+            const saveBtn = document.getElementById('save-edit-btn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<div class="loading"></div> กำลังบันทึก...';
+
+            const id = document.getElementById('edit-id').value;
+            const patient = allPatients.find(p => p.ID === id);
+            
+            if (!patient) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่พบข้อมูลผู้ป่วย',
+                    confirmButtonColor: '#42A5F5'
+                });
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '💾 บันทึกการแก้ไข';
+                return;
+            }
+
+            const formulas = [];
+            document.querySelectorAll('[id^="edit-formula-"]:checked').forEach(cb => {
+                formulas.push(cb.value);
+            });
+            const formulaType = formulas.join(', ');
+
+            const channels = [];
+            document.querySelectorAll('[id^="edit-channel-"]:checked').forEach(cb => {
+                channels.push(cb.value);
+            });
+
+            const results = [];
+            document.querySelectorAll('[id^="edit-result-"]:checked').forEach(cb => {
+                results.push(cb.value);
+            });
+
+            const additionalDetails = document.getElementById('edit-additional-details').value;
+            const hasFollowUpResult = results.length > 0 || additionalDetails.trim() !== '';
+
+            const updatedPatient = {
+                'วันที่เรียน': document.getElementById('edit-learning-date').value,
+                'HN': document.getElementById('edit-hn').value,
+                'ชื่อ': document.getElementById('edit-first-name').value,
+                'สกุล': document.getElementById('edit-last-name').value,
+                'หอผู้ป่วย': document.getElementById('edit-ward').value,
+                'สูตรอาหาร': formulaType,
+                'ความเข้มข้น': document.getElementById('edit-concentration').value,
+                'ปริมาณต่อมื้อ': document.getElementById('edit-amount-per-meal').value,
+                'มื้อต่อวัน': document.getElementById('edit-meals-per-day').value,
+                'วันที่ติดตาม': document.getElementById('edit-follow-up-date').value,
+                'ช่องทาง': channels.join(', '),
+                'ผลการติดตาม': results.join(', '),
+                'รายละเอียด': additionalDetails,
+                'สถานะติดตาม': hasFollowUpResult ? 'ติดตามแล้ว' : 'รอติดตาม',
+                'วันที่บันทึก': patient.created_at,
+                'ID': id
+            };
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'update',
+                        record: updatedPatient
+                    })
+                });
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'แก้ไขสำเร็จ',
+                    text: 'ข้อมูลผู้ป่วยถูกแก้ไขแล้ว',
+                    confirmButtonColor: '#42A5F5',
+                    timer: 2000
+                });
+                
+                closeEditModal();
+                await loadDataFromGoogleSheets();
+                
+            } catch (error) {
+                console.error('Update error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถแก้ไขข้อมูลได้',
+                    confirmButtonColor: '#42A5F5'
+                });
+            }
+
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '💾 บันทึกการแก้ไข';
+        }
+
+        async function deletePatient(id) {
+            const result = await Swal.fire({
+                title: '⚠️ ยืนยันการลบ',
+                text: 'คุณต้องการลบข้อมูลผู้ป่วยนี้หรือไม่?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#42A5F5',
+                cancelButtonColor: '#66BB6A',
+                confirmButtonText: '✓ ใช่, ลบเลย',
+                cancelButtonText: '✗ ยกเลิก'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'delete',
+                            id: id
+                        })
+                    });
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ลบสำเร็จ',
+                        text: 'ข้อมูลผู้ป่วยถูกลบแล้ว',
+                        confirmButtonColor: '#42A5F5',
+                        timer: 2000
+                    });
+                    
+                    await loadDataFromGoogleSheets();
+                    
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'ไม่สามารถลบข้อมูลได้',
+                        confirmButtonColor: '#42A5F5'
+                    });
+                }
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear() + 543;
+            return `${day}/${month}/${year}`;
+        }
+
+        function downloadChart(chartId, filename) {
+            const canvas = document.getElementById(chartId);
+            const url = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `${filename}.png`;
+            link.href = url;
+            link.click();
+        }
+
+        async function onConfigChange(config) {
+            const appTitle = config.app_title || defaultConfig.app_title;
+
+            document.getElementById('sidebar-title').textContent = appTitle;
+            document.getElementById('home-title').textContent = appTitle;
+        }
+
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig: defaultConfig,
+                onConfigChange: onConfigChange,
+                mapToCapabilities: (config) => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["app_title", config.app_title || defaultConfig.app_title]
+                ])
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bda024f619d2711',t:'MTc2ODM2MDk0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
